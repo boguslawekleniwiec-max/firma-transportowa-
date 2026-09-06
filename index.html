@@ -3,117 +3,308 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111827">
-<title>Firma Transportowa</title>
+<meta name="theme-color" content="#0b1220">
+<title>Firma Transportowa 2.0</title>
 <style>
-:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#eef2f7;background:#0b1020}
-*{box-sizing:border-box} body{margin:0;background:linear-gradient(160deg,#0b1020,#111827);min-height:100vh}
-.app{max-width:760px;margin:auto;padding:16px 14px 92px}
-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
-h1{font-size:24px;margin:0}.sub{color:#9ca3af;font-size:13px;margin-top:3px}
-.card{background:#151d2e;border:1px solid #273449;border-radius:18px;padding:15px;margin:10px 0;box-shadow:0 8px 24px #0003}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#0f1727;border-radius:13px;padding:11px}.label{font-size:11px;color:#9ca3af}.value{font-size:18px;font-weight:700;margin-top:4px}
-nav{position:fixed;bottom:0;left:0;right:0;background:#101827ee;backdrop-filter:blur(14px);border-top:1px solid #263247;display:grid;grid-template-columns:repeat(4,1fr);padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:5}
-nav button{background:none;border:0;color:#9ca3af;padding:8px 3px;font-size:12px}nav button.active{color:#fff;font-weight:700}
-button.action{border:0;border-radius:12px;background:#2563eb;color:white;padding:11px 14px;font-weight:700}button.secondary{background:#273449}
-button:disabled{opacity:.45}
-.row{display:flex;justify-content:space-between;gap:10px;align-items:center}.muted{color:#9ca3af}.good{color:#4ade80}.bad{color:#fb7185}
-.job h3{margin:0 0 5px}.job{border-left:3px solid #2563eb}.small{font-size:12px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.log{max-height:180px;overflow:auto;font-size:13px;color:#cbd5e1}.log div{padding:5px 0;border-bottom:1px solid #263247}
+*{box-sizing:border-box}body{margin:0;background:#0a1020;color:#eef3ff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,select{font:inherit}button{border:0;border-radius:14px;padding:12px 15px;background:#2563eb;color:white;font-weight:800}
+button.secondary{background:#26344d}button.warn{background:#b45309}button.danger{background:#b91c1c}button:disabled{opacity:.4}
+.wrap{max-width:1100px;margin:auto;padding:18px 14px 100px}.top{display:flex;justify-content:space-between;gap:12px;align-items:center}
+h1{font-size:30px;margin:0 0 4px}.sub{color:#9eabc2}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:16px 0}
+.card{background:#131d31;border:1px solid #263650;border-radius:22px;padding:18px;box-shadow:0 10px 30px #0002}
+.stat b{font-size:27px;display:block}.muted{color:#93a1ba}.good{color:#5ee39a}.bad{color:#ff7d7d}.gold{color:#ffd166}
+.tabs{position:fixed;bottom:0;left:0;right:0;background:#0d1729ee;backdrop-filter:blur(16px);border-top:1px solid #263650;display:flex;justify-content:center;z-index:5}
+.tabs button{border-radius:0;background:transparent;color:#aeb9cb;flex:1;max-width:180px;padding:13px 5px}.tabs button.active{color:white;background:#16243b}
+.row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}.list{display:grid;gap:10px}.pill{display:inline-block;padding:5px 9px;border-radius:999px;background:#22304a;color:#c8d4e8;font-size:12px;font-weight:800}
+.progress{height:10px;background:#26344d;border-radius:99px;overflow:hidden}.progress>i{display:block;height:100%;background:#3b82f6}
+table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:9px;border-bottom:1px solid #263650;text-align:left}th{color:#9eabc2}
+.notice{padding:12px;border-radius:14px;background:#18243a;border-left:4px solid #3b82f6;margin:10px 0}.log{max-height:260px;overflow:auto}.small{font-size:13px}.dangerbox{border-left-color:#ef4444}.greenbox{border-left-color:#22c55e}
+@media(min-width:800px){.cols{display:grid;grid-template-columns:1.3fr .7fr;gap:14px}}
 </style>
 </head>
 <body>
-<div class="app">
-<header><div><h1>🚛 Firma Transportowa</h1><div class="sub">Bez gemów. Bez P2W. Po prostu wożenie.</div></div><button class="action secondary" onclick="resetGame()">↻</button></header>
-<div id="screen"></div>
+<div class="wrap">
+<div class="top">
+  <div><h1>🚛 Firma Transportowa 2.0</h1><div class="sub">Huby • giełda ładunków • tachograf • pauzy • flota • finanse</div></div>
+  <button class="secondary" onclick="resetGame()">↻ Reset</button>
 </div>
-<nav id="nav">
-<button onclick="tab('home')">🏢<br>Firma</button>
-<button onclick="tab('jobs')">📋<br>Zlecenia</button>
-<button onclick="tab('fleet')">🚛<br>Flota</button>
-<button onclick="tab('drivers')">👨‍🔧<br>Kierowcy</button>
-</nav>
+<div id="app"></div>
+</div>
+<div class="tabs">
+<button id="t-company" onclick="tab='company';render()">🏢<br>Firma</button>
+<button id="t-jobs" onclick="tab='jobs';render()">📋<br>Zlecenia</button>
+<button id="t-hubs" onclick="tab='hubs';render()">🏭<br>Huby</button>
+<button id="t-fleet" onclick="tab='fleet';render()">🚛<br>Flota</button>
+<button id="t-drivers" onclick="tab='drivers';render()">👨‍🔧<br>Kierowcy</button>
+<button id="t-overload" onclick="tab='overload';render()">🏗️<br>Gabaryty</button>
+</div>
 <script>
-const routes=[
-["Wrocław","Berlin",680,420,540],["Poznań","Hamburg",720,450,560],["Łódź","Praga",520,330,430],
-["Katowice","Bratysława",470,290,390],["Gdańsk","Rotterdam",1450,880,1080],["Warszawa","Frankfurt",1250,760,940],
-["Kraków","Wiedeń",590,360,470],["Szczecin","Kopenhaga",780,470,590]
+const HUBS=[
+{id:'WRO',name:'Wrocław',country:'PL',type:'Regionalny hub',capacity:82,parking:28,services:['warsztat','paliwo','prysznic'],handling:1.0},
+{id:'POZ',name:'Poznań',country:'PL',type:'Centrum dystrybucyjne',capacity:74,parking:22,services:['paliwo','parking'],handling:1.1},
+{id:'BER',name:'Berlin',country:'DE',type:'Duży hub cross-dock',capacity:91,parking:35,services:['warsztat','paliwo','prysznic','hotel'],handling:.9},
+{id:'HAM',name:'Hamburg',country:'DE',type:'Portowy hub logistyczny',capacity:96,parking:42,services:['warsztat','paliwo','prysznic','hotel'],handling:1.2},
+{id:'DUI',name:'Duisburg',country:'DE',type:'Mega hub intermodalny',capacity:98,parking:50,services:['warsztat','paliwo','prysznic','hotel'],handling:1.3},
+{id:'RTM',name:'Rotterdam',country:'NL',type:'Port + centrum dystrybucji',capacity:97,parking:46,services:['warsztat','paliwo','prysznic','hotel'],handling:1.4},
+{id:'ANT',name:'Antwerpia',country:'BE',type:'Portowy hub kontenerowy',capacity:93,parking:40,services:['paliwo','prysznic','hotel'],handling:1.25},
+{id:'PRG',name:'Praga',country:'CZ',type:'Hub Europy Środkowej',capacity:79,parking:26,services:['warsztat','paliwo','prysznic'],handling:1.0},
+{id:'FRA',name:'Frankfurt',country:'DE',type:'Mega centrum cargo',capacity:95,parking:44,services:['warsztat','paliwo','prysznic','hotel'],handling:1.15},
+{id:'MIL',name:'Mediolan',country:'IT',type:'Hub południowy',capacity:87,parking:31,services:['warsztat','paliwo','prysznic','hotel'],handling:1.2},
+{id:'KRZ',name:'Krzyżowice',country:'PL',type:'Dolnośląski hub A4',capacity:94,parking:45,services:['warsztat','paliwo','prysznic','hotel'],handling:1.0},
+{id:'KAT',name:'Kąty Wrocławskie',country:'PL',type:'Hub dystrybucyjny A4',capacity:92,parking:40,services:['warsztat','paliwo','prysznic'],handling:1.0},
+{id:'DZL',name:'Dzierżoniów',country:'PL',type:'Regionalne centrum przemysłowe',capacity:68,parking:18,services:['warsztat','paliwo','parking'],handling:1.15},
+{id:'BIE',name:'Bielany Wrocławskie',country:'PL',type:'Mega centrum dystrybucyjne',capacity:97,parking:55,services:['warsztat','paliwo','prysznic','hotel'],handling:.9}
 ];
-const cargos=["AGD","palety FMCG","części samochodowe","materiały budowlane","elektronika","opakowania"];
-let S=JSON.parse(localStorage.getItem("ftgame")||"null")||{
-money:150000,day:1,rep:50,tab:"home",
-truck:{name:"MAN TGX 18.500",year:2018,km:740000,hp:500,cons:29,value:185000,condition:78},
-drivers:[{name:"Marek",exp:65,economy:62,safety:72,salary:3000}],
-jobs:[],log:["Dzień 1: firma została otwarta. Jeden MAN czeka na trasę."]
-};
-function save(){localStorage.setItem("ftgame",JSON.stringify(S))}
-function money(n){return Math.round(n).toLocaleString("pl-PL")+" zł"}
-function genJobs(){
- S.jobs=routes.map((r,i)=>({id:i,from:r[0],to:r[1],km:r[2],pay:r[3]+Math.round(Math.random()*r[4]),cargo:cargos[Math.floor(Math.random()*cargos.length)],weight:Math.round(8+Math.random()*15)}));
+const CARGO=[
+['AGD',18,2.3],['Elektronika',12,3.5],['Żywność',20,2.0],['Części samochodowe',22,2.6],
+['Napoje',24,1.8],['Chemia ADR',18,3.8],['Stal',24,2.1],['Odzież',14,2.7],['Mrożonki',18,3.2]
+];
+const TRUCKS=[
+{name:'MAN TGX 18.500',price:185000,year:2018,power:500,cons:29,cap:24},
+{name:'DAF XG 480',price:215000,year:2021,power:480,cons:27,cap:24},
+{name:'Volvo FH 500',price:285000,year:2022,power:500,cons:28,cap:25},
+{name:'Scania R 500',price:310000,year:2023,power:500,cons:27,cap:25},
+{name:'Volvo FH16 750',price:480000,year:2023,power:750,cons:34,cap:25,heavy:true},
+{name:'Scania R 770 V8',price:560000,year:2024,power:770,cons:36,cap:25,heavy:true}
+];
+const NAMES=['Marek','Paweł','Kamil','Tomasz','Łukasz','Michał','Robert','Daniel'];
+const SPECIAL_DRIVERS=[
+ {name:'Marian',unlockKm:15000,skill:100,safety:100,economy:100,salary:11500,bio:'📻 Król CB radia — zna każdą stację, każdy parking i pół Europy.'},
+ {name:'Piotrek',unlockKm:30000,skill:110,safety:110,economy:110,salary:14000,bio:'🔥 Specjalista. Statystyki 110/110/110, ale najpierw trzeba sobie na niego zapracować.'}
+];
+let tab='company', state=load();
+const OVERLOAD_CARGO=[
+ {name:'Przęsła do mostu',minPower:650,minSkill:90,minSafety:90,dist:220,payPerKm:13.5,weight:48,desc:'Ładunek ponadgabarytowy — wymaga pilotażu i mocnego zestawu.'},
+ {name:'Skrzydło turbiny wiatrowej',minPower:700,minSkill:95,minSafety:92,dist:340,payPerKm:16.8,weight:32,desc:'Długi ładunek specjalny. Wymaga bardzo doświadczonego kierowcy.'},
+ {name:'Transformator energetyczny',minPower:750,minSkill:100,minSafety:95,dist:280,payPerKm:19.5,weight:58,desc:'Ciężki gabaryt — tylko najmocniejsze zestawy.'},
+ {name:'Konstrukcja stalowa',minPower:650,minSkill:88,minSafety:88,dist:410,payPerKm:12.8,weight:44,desc:'Duży element konstrukcyjny. Liczy się moc i bezpieczeństwo.'}
+];
+
+function fresh(){
+ return {money:150000,day:1,rep:50,weekDrive:0,fortDrive:0,companyKm:0,driverId:1,truckId:1,nextDriver:2,plateSeq:1,coffee:0,cigarettes:0,
+   drivers:[{id:1,name:'Marek',skill:68,safety:74,economy:66,salary:6500,driveToday:0,driveWeek:0,shift:0,restDue:0}],
+   trucks:[{id:1,model:'MAN TGX 18.500',year:2018,km:740000,power:500,cons:29,condition:78,value:185000,driverId:1,fuel:72,plate:'DWR 00001',mods:{engine:0,tires:0,tank:0,comfort:0}}],
+   trailers:[{id:1,type:'Firanka',cap:24,value:65000,condition:88}],
+   jobs:[],activeJob:null,progress:0,loaded:false,hub:null,logs:['Dzień 1: firma została otwarta. Jeden MAN czeka na trasę.'],
+   hubState:{},lastEvent:''
+ };
 }
-function log(x){S.log.unshift(x);S.log=S.log.slice(0,30)}
-function tab(t){S.tab=t;render()}
-function endDay(){
- const t=S.truck;
- if(t.condition<30){log("❌ Ciężarówka jest w zbyt złym stanie.");return}
- const fixed=900;
- S.money-=fixed; S.day++; t.condition=Math.max(0,t.condition-1); t.km+=120;
- genJobs(); log(`🌙 Koniec dnia ${S.day-1}. Koszty stałe: ${money(fixed)}.`);
+function load(){try{const x=JSON.parse(localStorage.ft20)||fresh(); if(x.companyKm==null)x.companyKm=0; if(x.driverId==null)x.driverId=x.drivers?.[0]?.id||1; if(x.truckId==null)x.truckId=x.trucks?.[0]?.id||1; if(x.plateSeq==null)x.plateSeq=1; if(x.coffee==null)x.coffee=0; if(x.cigarettes==null)x.cigarettes=0; x.trucks?.forEach((t,i)=>{if(!t.plate)t.plate='DWR '+String(i+1).padStart(5,'0'); if(!t.mods)t.mods={engine:0,tires:0,tank:0,comfort:0}}); return x}catch(e){return fresh()}}
+function save(){localStorage.ft20=JSON.stringify(state)}
+function money(x){return Math.round(x).toLocaleString('pl-PL')+' zł'}
+function hub(id){return HUBS.find(x=>x.id===id)}
+function log(x){state.logs.unshift('Dzień '+state.day+': '+x);state.logs=state.logs.slice(0,40);save()}
+function resetGame(){if(confirm('Na pewno wyzerować firmę?')){state=fresh();save();render()}}
+function initHubs(){HUBS.forEach(h=>{if(!state.hubState[h.id])state.hubState[h.id]={congestion:Math.round(Math.random()*25),price:6+Math.random()*2}})}
+initHubs();
+
+function makeJobs(){
+ state.jobs=[];
+ const used=new Set();
+ for(let i=0;i<8;i++){
+  let a,b; do{a=HUBS[Math.floor(Math.random()*HUBS.length)];b=HUBS[Math.floor(Math.random()*HUBS.length)]}while(a.id===b.id||used.has(a.id+b.id));
+  used.add(a.id+b.id);
+  const c=CARGO[Math.floor(Math.random()*CARGO.length)], dist=180+Math.round(Math.sqrt((HUBS.indexOf(a)-HUBS.indexOf(b))**2)*120)+Math.floor(Math.random()*550);
+  const tons=Math.min(c[1],18+Math.floor(Math.random()*7));
+  // Stawka jest liczona za kilometr, a nie za tonę — dzięki temu zlecenia mają sens ekonomiczny.
+  const cargoMult = c[0]==='Chemia ADR' ? 1.22 : (c[0]==='Mrożonki' ? 1.12 : (c[0]==='Elektronika' ? 1.08 : 1.0));
+  const laneMult = (a.country===b.country ? 1.00 : 1.10) * (0.94 + Math.random()*0.18);
+  const rate = 5.45 * cargoMult * laneMult;
+  const pay=Math.round(dist*rate);
+  state.jobs.push({id:Date.now()+i,from:a.id,to:b.id,cargo:c[0],tons,dist,pay,load:30+Math.round(a.handling*20),unload:25+Math.round(b.handling*18),deadline:8+Math.floor(Math.random()*30),adr:c[0]==='Chemia ADR'});
+ }
+ save()
+}
+if(!state.jobs.length)makeJobs();
+
+function driver(){return state.drivers.find(d=>d.id===state.driverId)||state.drivers[0]}
+function truck(){return state.trucks.find(t=>t.id===state.truckId)||state.trucks[0]}
+function selectTruck(id){if(!state.trucks.some(t=>t.id===id))return;state.truckId=id;log('Aktywny zestaw: '+truck().model+' ['+(truck().plate||'DWR')+'].');save();render()}
+function hasOverloadRig(){return state.trucks.some(t=>t.power>=650)}
+function overloadDriver(){return state.drivers.find(d=>d.skill>=88&&d.safety>=88)}
+function buyConsumable(type){const price=type==='coffee'?8:25;if(state.money<price){alert('Za mało gotówki.');return}state.money-=price;state[type==='coffee'?'coffee':'cigarettes']++;log(type==='coffee'?'Kupiono kawę ☕':'Kupiono papierosy 🚬');save();render()}
+function useConsumable(type){const key=type==='coffee'?'coffee':'cigarettes';if(!state[key]){alert('Nie masz tego na stanie.');return}state[key]--;log(type==='coffee'?'Kierowca wypił kawę ☕.':'Kierowca wyszedł na papierosa 🚬.');save();render()}
+function fireDriver(id){const d=state.drivers.find(x=>x.id===id);if(!d)return;if(d.id===state.driverId){alert('Nie możesz zwolnić aktywnego kierowcy. Najpierw wybierz innego.');return}if(state.drivers.length<=1){alert('Firma musi mieć co najmniej jednego kierowcę.');return}if(confirm('Zwolnić '+d.name+'?')){state.drivers=state.drivers.filter(x=>x.id!==id);log('Zwolniono kierowcę '+d.name+'.');save();render()}}
+function plate(id){const t=state.trucks.find(x=>x.id===id);if(!t)return;const p=prompt('Podaj tablicę rejestracyjną (np. DWR 12345):',t.plate||'DWR 00001');if(p&&/^DWR\s?[A-Z0-9]{4,6}$/i.test(p.trim())){t.plate=p.trim().toUpperCase();log('Zmieniono tablicę '+t.model+' na '+t.plate+'.');save();render()}else if(p)alert('Tablica musi zaczynać się od DWR.')}
+function modifyTruck(id,type){const t=state.trucks.find(x=>x.id===id);if(!t)return;const cfg={engine:[85000,'silnik +80 KM',80],tires:[18000,'opony premium',1],tank:[12000,'większy zbiornik',12],comfort:[22000,'kabina komfort',1]}[type];if(!cfg)return;const level=t.mods[type]||0;if(level>=1){alert('Ta modyfikacja jest już zamontowana.');return}if(state.money<cfg[0]){alert('Za mało gotówki.');return}state.money-=cfg[0];t.mods[type]=1;if(type==='engine')t.power+=cfg[2];if(type==='tires')t.cons=Math.max(24,t.cons-1);if(type==='tank')t.fuel=100;if(type==='comfort')t.condition=Math.min(100,t.condition+cfg[2]);log('Zamontowano: '+cfg[1]+' w '+t.model+'.');save();render()}
+function canDrive(min){
+ const d=driver();
+ if(d.driveToday>=540)return {ok:false,msg:'Limit 9 h jazdy na dziś osiągnięty. Potrzebna odpoczynek dobowy.'};
+ if(d.driveToday+min>540)return {ok:false,msg:'Ten odcinek przekroczyłby 9 h jazdy dzisiaj.'};
+ if(d.shift>=270)return {ok:false,msg:'Po 4 h 30 min jazdy trzeba zrobić 45 min pauzy.'};
+ if(d.driveWeek+min>3360)return {ok:false,msg:'Limit 56 h jazdy w tygodniu zostałby przekroczony.'};
+ return {ok:true}
+}
+function drive(min){
+ const c=canDrive(min);if(!c.ok){alert(c.msg);return}
+ const d=driver(),t=truck(); d.driveToday+=min;d.driveWeek+=min;state.weekDrive+=min;state.fortDrive+=min;d.shift+=min;
+ state.progress+=min; const km=Math.round(min*1.2); t.km+=km; state.companyKm+=km; t.condition=Math.max(0,t.condition-min*.015);
+ const fuel=t.cons*(min/60)*1.05; t.fuel=Math.max(0,t.fuel-fuel);
+ if(d.shift>=270){state.lastEvent='⏸️ Po 4 h 30 min jazdy trzeba zrobić 45 min pauzy.'}
+ log('Przejechano '+(min/60).toFixed(2)+' h. Tachograf: '+fmt(d.shift)+' od ostatniej pauzy.');
  save();render()
 }
-function takeJob(id){
- const j=S.jobs.find(x=>x.id===id); if(!j)return;
- const t=S.truck, fuel=j.km*t.cons/100, fuelCost=fuel*6.5, toll=j.km*.34, driver=120;
- const profit=j.pay-fuelCost-toll-driver;
- if(S.money+profit<0)return;
- S.money+=profit; t.km+=j.km; t.condition=Math.max(0,t.condition-Math.max(1,Math.round(j.km/700)));
- S.rep=Math.min(100,S.rep+(profit>0?1:0)); log(`📦 ${j.from} → ${j.to}: ${money(profit)} zysku.`);
- S.jobs=S.jobs.filter(x=>x.id!==id); save();render()
+function breakTime(min){
+ const d=driver(); if(min===45){d.shift=0;log('Pauza 45 min zaliczona. Kierowca może dalej jechać.')}
+ else if(min===15){d.shift=Math.max(0,d.shift-15);log('Pierwsza część pauzy 15 min. Do pełnego podziału potrzebna później pauza 30 min.')}
+ else if(min===30){d.shift=0;log('Pauza 30 min zakończona.')}
+ save();render()
 }
-function repair(){
- const cost=Math.round((100-S.truck.condition)*420);
- if(S.money<cost)return;
- S.money-=cost;S.truck.condition=100;log(`🔧 Serwis: ${money(cost)}.`);save();render()
+function rest(hours){
+ const d=driver(); if(hours<9)return;
+ d.driveToday=0;d.shift=0;d.restDue=0;state.day += Math.max(0,Math.round(hours/11));
+ state.money-=250;log('Odpoczynek '+hours+' h. Koszt postoju/utrzymania '+money(250)+'.');
+ if(hours>=11)log('Regularny odpoczynek dobowy 11 h.');
+ save();render()
 }
-function buyTruck(){
- if(S.money<215000)return;
- S.money-=215000;S.truck={name:"DAF XG 480",year:2022,km:210000,hp:480,cons:27,value:290000,condition:100};
- log("🚛 Kupiono DAF XG 480.");save();render()
+function weeklyRest(hours){
+ if(hours<24){alert('Minimalny skrócony odpoczynek tygodniowy w tej wersji to 24 h.');return}
+ state.day+=Math.round(hours/24);driver().driveWeek=0;state.weekDrive=0;driver().driveToday=0;driver().shift=0;
+ state.money-=500;log('Odpoczynek tygodniowy '+hours+' h. Tydzień pracy zresetowany.');
+ save();render()
+}
+function fmt(m){let h=Math.floor(m/60),x=m%60;return h+'h '+String(x).padStart(2,'0')+'m'}
+
+
+function jobCosts(j){
+ const t=truck(), d=driver();
+ const fuelPrice=7.45; // PLN/l — łatwa do zmiany w ustawieniach ekonomii gry
+ const fuelCost=j.dist*t.cons/100*fuelPrice;
+ const tollRate=(hub(j.from).country==='DE'||hub(j.to).country==='DE')?0.95:0.65;
+ const tollCost=j.dist*tollRate;
+ const driverCost=j.dist/650*950; // orientacyjny koszt pracy kierowcy
+ const maintenance=j.dist*0.38;
+ const insurance=j.dist*0.10;
+ const handling=180;
+ const total=fuelCost+tollCost+driverCost+maintenance+insurance+handling;
+ return {fuelCost,tollCost,driverCost,maintenance,insurance,handling,total,profit:j.pay-total,rate:j.pay/j.dist};
+}
+function profitBadge(j){
+ const c=jobCosts(j);
+ return `<div class="notice ${c.profit>=0?'greenbox':'dangerbox'}">
+ <b>${c.profit>=0?'✅ OPŁACALNE':'❌ STRATA'}</b> • przychód <b>${money(j.pay)}</b> • szacowany koszt <b>${money(c.total)}</b> • wynik <b class="${c.profit>=0?'good':'bad'}">${money(c.profit)}</b>
+ <div class="small muted">Stawka ${c.rate.toFixed(2)} zł/km • paliwo ${money(c.fuelCost)} • myto ${money(c.tollCost)} • kierowca ${money(c.driverCost)} • serwis ${money(c.maintenance)}</div></div>`;
+}
+
+function accept(id){
+ if(state.activeJob){alert('Najpierw zakończ aktualne zlecenie.');return}
+ const j=state.jobs.find(x=>x.id===id);state.activeJob=j;state.loaded=false;state.hub=j.from;state.progress=0;
+ log('Przyjęto zlecenie '+j.cargo+': '+hub(j.from).name+' → '+hub(j.to).name+'.');save();render()
+}
+function loadCargo(){
+ if(!state.activeJob||state.loaded)return;
+ const j=state.activeJob,h=hub(j.from),hs=state.hubState[h.id],mins=Math.round(j.load*hs.congestion/50);
+ state.money-=Math.round(mins*4);state.loaded=true;log('Załadunek w hubie '+h.name+' trwał '+mins+' min. Kolejka: '+hs.congestion+'%.');save();render()
+}
+function unloadCargo(){
+ if(!state.activeJob||!state.loaded||state.progress<state.activeJob.dist){alert('Najpierw dowieź ładunek do celu.');return}
+ const j=state.activeJob,h=hub(j.to),hs=state.hubState[h.id],mins=Math.round(j.unload*hs.congestion/50);
+ const c=jobCosts(j);
+ state.money+=j.pay-c.total;state.rep=Math.min(100,state.rep+(c.profit>=0?2:-2));
+ log('Rozładunek w '+h.name+' zakończony. Przychód '+money(j.pay)+', koszty '+money(c.total)+', wynik '+money(c.profit)+'.');
+ state.activeJob=null;state.loaded=false;state.progress=0;state.hub=null;makeJobs();save();render()
+}
+function endDay(){
+ const fixed=650+state.trucks.length*150+state.drivers.length*250;
+ state.money-=fixed;state.day++;
+ state.drivers.forEach(d=>{d.driveToday=0;d.shift=0});
+ HUBS.forEach(h=>state.hubState[h.id].congestion=Math.max(5,Math.min(100,state.hubState[h.id].congestion+Math.floor(Math.random()*21)-8)));
+ if(Math.random()<.25){state.lastEvent='🌧️ Utrudnienia pogodowe: część hubów zwiększyła kongestię.';log(state.lastEvent)}
+ else state.lastEvent='Dzień zakończony. Koszty stałe: '+money(fixed)+'.';
+ makeJobs();save();render()
+}
+function buyTruck(i){
+ const x=TRUCKS[i];if(state.money<x.price){alert('Za mało gotówki.');return}
+ state.money-=x.price;const newTruckId=Date.now();state.trucks.push({id:newTruckId,model:x.name,year:x.year,km:120000,power:x.power,cons:x.cons,condition:96,value:x.price,fuel:90,driverId:null,plate:'DWR '+String(++state.plateSeq).padStart(5,'0'),mods:{engine:0,tires:0,tank:0,comfort:0}}); state.truckId=newTruckId;
+ log('Kupiono '+x.name+' za '+money(x.price)+'.');save();render()
 }
 function hire(){
- if(S.money<5000)return;
- const names=["Piotr","Kamil","Tomek","Bartek","Adrian"];let n=names[S.drivers.length%names.length];
- S.money-=5000;S.drivers.push({name:n,exp:45,economy:55,safety:60,salary:3000});log(`👨‍🔧 Zatrudniono kierowcę ${n}.`);save();render()
+ const cost=8500;if(state.money<cost){alert('Za mało gotówki.');return}
+ const n=NAMES.find(x=>!state.drivers.some(d=>d.name===x))||('Kierowca '+state.nextDriver++);
+ state.money-=cost;state.drivers.push({id:Date.now(),name:n,skill:50+Math.floor(Math.random()*35),safety:55+Math.floor(Math.random()*35),economy:50+Math.floor(Math.random()*40),salary:5800+Math.floor(Math.random()*2400),driveToday:0,driveWeek:0,shift:0,restDue:0});
+ log('Zatrudniono '+n+'. Koszt rekrutacji '+money(cost)+'.');save();render()
 }
-function resetGame(){if(confirm("Na pewno wyzerować zapis?")){localStorage.removeItem("ftgame");location.reload()}}
-function home(){
- return `<div class="stats"><div class="stat"><div class="label">KASA</div><div class="value">${money(S.money)}</div></div><div class="stat"><div class="label">DZIEŃ</div><div class="value">${S.day}</div></div><div class="stat"><div class="label">REPUTACJA</div><div class="value">${S.rep}/100</div></div></div>
- <div class="card"><div class="row"><div><b>${S.truck.name}</b><div class="muted small">${S.truck.year} • ${S.truck.km.toLocaleString("pl-PL")} km • ${S.truck.hp} KM</div></div><b>${S.truck.condition}%</b></div></div>
- <div class="card"><h3>Dzień roboczy</h3><p class="muted">Przyjmuj ładunki, zarabiaj, naprawiaj sprzęt i rozbudowuj firmę.</p><button class="action" onclick="endDay()">🌙 Zakończ dzień</button></div>
- <div class="card"><h3>Dziennik</h3><div class="log">${S.log.map(x=>`<div>${x}</div>`).join("")}</div></div>`;
+function unlockSpecial(name){
+ const s=state.drivers.find(d=>d.name===name); if(s){state.driverId=s.id;log('Kierowca '+name+' został wybrany do jazdy.');save();render();return}
+ const cfg=SPECIAL_DRIVERS.find(x=>x.name===name); if(!cfg)return;
+ if(state.companyKm<cfg.unlockKm){alert('Jeszcze za wcześnie. Potrzebujesz '+fmt(cfg.unlockKm)+' km przebiegu firmy. Brakuje '+fmt(cfg.unlockKm-state.companyKm)+' km.');return}
+ const d={id:Date.now()+Math.floor(Math.random()*1000),name:cfg.name,skill:cfg.skill,safety:cfg.safety,economy:cfg.economy,salary:cfg.salary,driveToday:0,driveWeek:0,shift:0,restDue:0,special:true,bio:cfg.bio};
+ state.drivers.push(d);state.driverId=d.id;log('Odblokowano specjalnego kierowcę '+cfg.name+'!');save();render()
+}
+function selectDriver(id){if(!state.drivers.some(d=>d.id===id))return;state.driverId=id;log('Aktywny kierowca: '+driver().name+'.');save();render()}
+function repair(id){
+ const t=state.trucks.find(x=>x.id===id),cost=Math.round((100-t.condition)*70);
+ if(state.money<cost){alert('Za mało na serwis.');return}
+ state.money-=cost;t.condition=100;log('Serwis '+t.model+': '+money(cost)+'.');save();render()
+}
+function refuel(id){
+ const t=state.trucks.find(x=>x.id===id),cost=Math.round((100-t.fuel)*2.1);
+ if(state.money<cost){alert('Za mało na paliwo.');return}
+ state.money-=cost;t.fuel=100;log('Tankowanie '+t.model+': '+money(cost)+'.');save();render()
+}
+
+function overload(){
+ const t=truck(),d=driver(),okRig=t.power>=650,okDriver=d.skill>=88&&d.safety>=88;
+ const cards=OVERLOAD_CARGO.map((o,i)=>{const eligible=t.power>=o.minPower&&d.skill>=o.minSkill&&d.safety>=o.minSafety; const pay=Math.round(o.dist*o.payPerKm); return `<div class=\"card\"><h3>🏗️ ${o.name}</h3><p>${o.desc}</p><p>📏 ${o.dist} km • ⚖️ ${o.weight} t • 💰 <b>${money(pay)}</b></p><p>Wymagania: ${o.minPower} KM • doświadczenie ${o.minSkill} • bezpieczeństwo ${o.minSafety}</p><button ${eligible?'':'disabled'} onclick=\"acceptOverload(${i})\">${eligible?'Przyjmij gabaryt':'🔒 Zablokowane'}</button></div>`}).join('');
+ return `<div class=\"card\"><h2>🏗️ Zlecenia gabarytowe / overload</h2><p class=\"muted\">Przęsła, skrzydła turbin, transformatory i inne ładunki ponadgabarytowe. Potrzebujesz odpowiednio mocnej ciężarówki oraz kierowcy z wysokimi statystykami.</p><div class=\"notice ${okRig&&okDriver?'greenbox':'dangerbox'}\">${okRig?'✅ Masz odpowiednio mocny zestaw.':'🔒 Potrzebujesz ciężarówki min. 650 KM.'} ${okDriver?'Kierowca spełnia wymagania.':'Potrzebujesz kierowcy min. 88 doświadczenia i 88 bezpieczeństwa.'}</div></div><div class=\"grid\">${cards}</div>`
+}
+function acceptOverload(i){const o=OVERLOAD_CARGO[i],t=truck(),d=driver();if(t.power<o.minPower||d.skill<o.minSkill||d.safety<o.minSafety){alert('Ten gabaryt wymaga mocniejszego zestawu i odpowiedniego kierowcy.');return}if(state.activeJob){alert('Najpierw zakończ aktualne zlecenie.');return}const a=HUBS[Math.floor(Math.random()*HUBS.length)],b=HUBS[Math.floor(Math.random()*HUBS.length)];const j={id:Date.now(),from:a.id,to:b.id,cargo:o.name,tons:o.weight,dist:o.dist,pay:Math.round(o.dist*o.payPerKm),load:90,unload:100,deadline:48,adr:false,overload:true};state.activeJob=j;state.loaded=false;state.hub=a.id;state.progress=0;log('Przyjęto GABARYT: '+o.name+'. Konwój wymaga pełnej koncentracji.');save();tab='company';render()}
+
+function company(){
+ const t=truck(),d=driver(),j=state.activeJob;
+ return `<div class="grid">
+ <div class="card stat"><span class="muted">KASA</span><b>${money(state.money)}</b></div>
+ <div class="card stat"><span class="muted">DZIEŃ</span><b>${state.day}</b></div>
+ <div class="card stat"><span class="muted">REPUTACJA</span><b>${state.rep}/100</b></div>
+ <div class="card stat"><span class="muted">JAZDA TYG.</span><b>${fmt(state.weekDrive)}</b><span class="muted">limit 56 h</span></div>
+ </div>
+ <div class="cols"><div>
+ <div class="card"><h2>🚛 ${t.model}</h2><div class="muted">${t.year} • ${Math.round(t.km).toLocaleString('pl-PL')} km • ${t.power} KM</div>
+ <p>Stan <b>${Math.round(t.condition)}%</b> • paliwo <b>${Math.round(t.fuel)}%</b></p>
+ <div class="progress"><i style="width:${t.condition}%"></i></div></div>
+ <div class="card"><h2>📦 Aktualna operacja</h2>${j?jobProgress(j):`<p class="muted">Brak aktywnego zlecenia. Wejdź w Giełdę ładunków.</p>`}</div>
+ <div class="card"><h2>📝 Dziennik</h2><div class="log">${state.logs.map(x=>'<div class="notice small">'+x+'</div>').join('')}</div></div>
+ </div>
+ <div><div class="card"><h2>⏱️ Tachograf</h2><p>Jazda dziś: <b>${fmt(d.driveToday)}</b> / 9 h</p><div class="progress"><i style="width:${d.driveToday/540*100}%"></i></div>
+ <p>Od pauzy: <b>${fmt(d.shift)}</b> / 4 h 30</p><div class="progress"><i style="width:${d.shift/270*100}%"></i></div>
+ <p class="small muted">W grze stosujemy zasady UE: po maks. 4 h 30 min jazdy potrzebna jest co najmniej 45-minutowa pauza; dobowy limit jazdy to 9 h, z możliwością 10 h dwa razy w tygodniu.</p>
+ <div class="row"><button onclick="breakTime(45)">⏸️ Pauza 45 min</button><button class="secondary" onclick="rest(11)">🛏️ Odpoczynek 11 h</button></div></div>
+ <div class="card"><h2>☕🚬 Kierowca</h2><p>Kawa: <b>${state.coffee}</b> • Papierosy: <b>${state.cigarettes}</b></p><button class="secondary" onclick="buyConsumable('coffee')">☕ Kup kawę 8 zł</button> <button class="secondary" onclick="buyConsumable('cigarettes')">🚬 Kup papierosy 25 zł</button><br><button class="secondary" onclick="useConsumable('coffee')">☕ Wypij kawę</button> <button class="secondary" onclick="useConsumable('cigarettes')">🚬 Papieros</button></div><div class="card"><h2>🌙 Koniec dnia</h2><p class="muted">Koszty stałe są pobierane przy zamknięciu dnia.</p><button onclick="endDay()">Zakończ dzień</button></div></div></div>`
+}
+function jobProgress(j){
+ const p=Math.min(100,j.dist?state.progress/j.dist*100:0);
+ return `<p><span class="pill">${j.cargo}${j.adr?' • ADR':''}</span> <span class="pill">${j.tons} t</span></p>
+ <p><b>${hub(j.from).name}</b> → <b>${hub(j.to).name}</b> • ${j.dist} km</p>
+ <div class="progress"><i style="width:${p}%"></i></div><p>${Math.round(state.progress)} / ${j.dist} km</p>
+ <div class="row">${!state.loaded?`<button onclick="loadCargo()">📦 Załaduj</button>`:`<button onclick="drive(90)">🚛 Jedź 1:30</button><button onclick="drive(180)">🚛 Jedź 3:00</button>`}
+ ${state.loaded?`<button class="secondary" onclick="breakTime(45)">⏸️ Pauza 45</button>`:''}
+ ${state.loaded?`<button class="secondary" onclick="unloadCargo()">🏭 Rozładuj</button>`:''}</div>`
 }
 function jobs(){
- if(!S.jobs.length)genJobs();
- return `<div class="card"><div class="row"><div><h2 style="margin:0">Zlecenia</h2><div class="muted small">Koszty liczone automatycznie: paliwo + opłaty + kierowca.</div></div><button class="action" onclick="genJobs();render()">↻</button></div></div>`+
- S.jobs.map(j=>`<div class="card job"><h3>${j.from} → ${j.to}</h3><div class="muted">${j.cargo} • ${j.weight} t • ${j.km} km</div><div class="row" style="margin-top:10px"><b>${money(j.pay)}</b><button class="action" onclick="takeJob(${j.id})">Przyjmij</button></div></div>`).join("");
+ return `<div class="card"><div class="row"><h2>📋 Giełda ładunków</h2><button class="secondary" onclick="makeJobs();render()">↻ Odśwież</button></div>
+ <div class="notice">💰 Zlecenia są teraz wyceniane stawką za kilometr i pokazują przewidywany koszt paliwa, myta, kierowcy i utrzymania. Nie powinieneś dostawać „ujemnych” zleceń bez ostrzeżenia.</div>
+ <div class="list">${state.jobs.map(j=>`<div class="card"><div class="row"><div><b>${j.cargo}</b> ${j.adr?'<span class="pill">ADR</span>':''}<div class="muted">${hub(j.from).name} → ${hub(j.to).name} • ${j.dist} km • ${j.tons} t</div></div><div><b class="good">${money(j.pay)}</b><br><button onclick="accept(${j.id})" ${state.activeJob?'disabled':''}>Przyjmij</button></div></div>${profitBadge(j)}</div>`).join('')}</div></div>`
+}
+function hubs(){
+ return `<div class="card"><h2>🏭 Huby logistyczne Europy</h2><p class="muted">Każdy hub ma własną przepustowość, parking, kongestię i usługi. Im większa kolejka, tym dłuższy załadunek/rozładunek.</p></div>
+ <div class="grid">${HUBS.map(h=>{let s=state.hubState[h.id];return `<div class="card"><h3>🏭 ${h.name}</h3><span class="pill">${h.country} • ${h.type}</span><p>Przepustowość: <b>${h.capacity}%</b><br>Parking: <b>${h.parking}</b> miejsc<br>Kongestia: <b class="${s.congestion>70?'bad':''}">${s.congestion}%</b></p><div class="progress"><i style="width:${s.congestion}%"></i></div><p class="small muted">Usługi: ${h.services.join(' • ')}</p></div>`}).join('')}</div>`
 }
 function fleet(){
- const repairCost=Math.round((100-S.truck.condition)*420);
- return `<div class="card"><h2>Flota</h2><div class="row"><div><b>${S.truck.name}</b><div class="muted">${S.truck.year} • ${S.truck.hp} KM</div></div><b>${S.truck.condition}%</b></div>
- <p class="small muted">Przebieg: ${S.truck.km.toLocaleString("pl-PL")} km • spalanie: ${S.truck.cons} l/100 km • wartość: ${money(S.truck.value)}</p>
- <div class="grid2"><button class="action" ${repairCost<=0||S.money<repairCost?"disabled":""} onclick="repair()">🔧 Napraw ${money(repairCost)}</button>
- <button class="action" ${S.money<215000?"disabled":""} onclick="buyTruck()">🚛 DAF XG • 215k</button></div></div>`;
+ return `<div class="card"><h2>🚛 Flota</h2><p class="muted">Kupuj ciężarówki, tankuj i pilnuj stanu technicznego.</p></div>
+ <div class="list">${state.trucks.map(t=>`<div class="card"><div class="row"><div><h3>${t.model}</h3><div class="muted">${t.year} • ${Math.round(t.km).toLocaleString('pl-PL')} km • ${t.power} KM</div></div><span class="pill">Stan ${Math.round(t.condition)}%</span></div><p>Tablica: <b>${t.plate||'DWR 00001'}</b><br>Paliwo ${Math.round(t.fuel)}% • spalanie ${t.cons} l/100 km</p><button ${state.truckId===t.id?'disabled':''} onclick="selectTruck(${t.id})">${state.truckId===t.id?'🚛 Aktywny':'Użyj tego zestawu'}</button> <button class="secondary" onclick="refuel(${t.id})">⛽ Tankuj</button> <button class="secondary" onclick="repair(${t.id})">🔧 Serwis</button> <button class="secondary" onclick="plate(${t.id})">🔤 Tablica</button><details style="margin-top:10px"><summary>🔧 Modyfikacje</summary><p class="small muted">Silnik +80 KM • opony -1 l/100 km • zbiornik + paliwo • kabina + stan</p><button class="secondary" onclick="modifyTruck(${t.id},'engine')">Silnik 85 tys.</button> <button class="secondary" onclick="modifyTruck(${t.id},'tires')">Opony 18 tys.</button> <button class="secondary" onclick="modifyTruck(${t.id},'tank')">Zbiornik 12 tys.</button> <button class="secondary" onclick="modifyTruck(${t.id},'comfort')">Kabina 22 tys.</button></details></div>`).join('')}</div>
+ <div class="card"><h2>🛒 Rynek ciężarówek</h2>${TRUCKS.map((x,i)=>`<div class="row" style="padding:10px 0;border-bottom:1px solid #263650"><span><b>${x.name}</b><br><span class="muted">${x.year} • ${x.power} KM • ${x.cons} l/100 km</span></span><span><b>${money(x.price)}</b> <button onclick="buyTruck(${i})">Kup</button></span></div>`).join('')}</div>`
 }
 function drivers(){
- return `<div class="card"><div class="row"><div><h2 style="margin:0">Kierowcy</h2><div class="muted small">Pensja: 3 000 zł / miesiąc</div></div><button class="action" ${S.money<5000?"disabled":""} onclick="hire()">+ Zatrudnij</button></div></div>`+
- S.drivers.map(d=>`<div class="card"><b>👨‍🔧 ${d.name}</b><div class="grid2 small" style="margin-top:10px"><div>Doświadczenie: ${d.exp}</div><div>Ekonomia: ${d.economy}</div><div>Bezpieczeństwo: ${d.safety}</div><div>Pensja: ${money(d.salary)}</div></div></div>`).join("");
+ const specialHtml=SPECIAL_DRIVERS.map(cfg=>{const d=state.drivers.find(x=>x.name===cfg.name); const unlocked=state.companyKm>=cfg.unlockKm; return d ? `<div class="card"><h3>⭐ ${cfg.name}</h3><p class="muted">${d.bio||cfg.bio}</p><p>Doświadczenie <b>${d.skill}</b>/110<br>Bezpieczeństwo <b>${d.safety}</b>/110<br>Ekonomia <b>${d.economy}</b>/110</p><button ${state.driverId===d.id?'disabled':''} onclick="selectDriver(${d.id})">${state.driverId===d.id?'🚛 Aktualnie prowadzi':'Wybierz kierowcę'}</button></div>` : `<div class="card"><h3>🔒 ${cfg.name}</h3><p>${cfg.bio}</p><p>Odblokowanie: <b>${fmt(cfg.unlockKm)} km</b><br>Twój przebieg firmy: <b>${fmt(state.companyKm)} km</b></p><button ${unlocked?'':'disabled'} onclick="unlockSpecial('${cfg.name}')">${unlocked?'🔓 Odblokuj':'🔒 Jeszcze zablokowany'}</button></div>`}).join('');
+ return `<div class="card"><div class="row"><div><h2>👨‍🔧 Kierowcy</h2><p class="muted">Umiejętności wpływają na spalanie, bezpieczeństwo i reputację. Aktywny kierowca prowadzi aktualną trasę.</p></div><button onclick="hire()">➕ Zatrudnij</button></div><p>🏁 Przebieg firmy: <b>${fmt(state.companyKm)} km</b></p></div>
+ <div class="grid">${state.drivers.map(d=>`<div class="card"><h3>👤 ${d.name} ${state.driverId===d.id?'🚛':''}</h3><p>${d.bio?d.bio+'<br>':''}Doświadczenie <b>${d.skill}</b>/110<br>Bezpieczeństwo <b>${d.safety}</b>/110<br>Ekonomia <b>${d.economy}</b>/110</p><p>Jazda dziś: ${fmt(d.driveToday)}<br>Tydzień: ${fmt(d.driveWeek)}<br>Pensja: ${money(d.salary)}/mies.</p><button ${state.driverId===d.id?'disabled':''} onclick="selectDriver(${d.id})">${state.driverId===d.id?'🚛 Aktualnie prowadzi':'Wybierz kierowcę'}</button> ${state.driverId!==d.id?`<button class=\"secondary\" onclick=\"fireDriver(${d.id})\">🗑️ Zwolnij</button>`:''}</div>`).join('')}</div>
+ <div class="grid">${specialHtml}</div>
+ <div class="card"><h2>🛌 Odpoczynki</h2><p class="muted">Regularny odpoczynek dobowy to co najmniej 11 h; skrócony może wynosić 9 h w określonych warunkach. Tygodniowy regularny odpoczynek to 45 h, a skrócony może być krótszy, ale nie mniej niż 24 h.</p><button onclick="rest(11)">🛏️ 11 h</button> <button class="secondary" onclick="rest(9)">🛏️ 9 h skrócony</button> <button class="secondary" onclick="weeklyRest(24)">📅 Tygodniowy 24 h</button> <button class="secondary" onclick="weeklyRest(45)">📅 Tygodniowy 45 h</button></div>`
 }
 function render(){
- let body=S.tab==="home"?home():S.tab==="jobs"?jobs():S.tab==="fleet"?fleet():drivers();
- document.getElementById("screen").innerHTML=body;
- document.querySelectorAll("#nav button").forEach((b,i)=>b.classList.toggle("active",["home","jobs","fleet","drivers"][i]===S.tab));
- save()
+ initHubs();
+ ['company','jobs','hubs','fleet','drivers','overload'].forEach(x=>document.getElementById('t-'+x).classList.toggle('active',x===tab));
+ document.getElementById('app').innerHTML=tab==='company'?company():tab==='jobs'?jobs():tab==='hubs'?hubs():tab==='fleet'?fleet():tab==='drivers'?drivers():overload();
 }
 render();
 </script>
