@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>Firma Transportowa</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#eef2f7;background:#0b1020}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(160deg,#0b1020,#111827);min-height:100vh}
+.app{max-width:760px;margin:auto;padding:16px 14px 92px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+h1{font-size:24px;margin:0}.sub{color:#9ca3af;font-size:13px;margin-top:3px}
+.card{background:#151d2e;border:1px solid #273449;border-radius:18px;padding:15px;margin:10px 0;box-shadow:0 8px 24px #0003}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#0f1727;border-radius:13px;padding:11px}.label{font-size:11px;color:#9ca3af}.value{font-size:18px;font-weight:700;margin-top:4px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#101827ee;backdrop-filter:blur(14px);border-top:1px solid #263247;display:grid;grid-template-columns:repeat(4,1fr);padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:5}
+nav button{background:none;border:0;color:#9ca3af;padding:8px 3px;font-size:12px}nav button.active{color:#fff;font-weight:700}
+button.action{border:0;border-radius:12px;background:#2563eb;color:white;padding:11px 14px;font-weight:700}button.secondary{background:#273449}
+button:disabled{opacity:.45}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center}.muted{color:#9ca3af}.good{color:#4ade80}.bad{color:#fb7185}
+.job h3{margin:0 0 5px}.job{border-left:3px solid #2563eb}.small{font-size:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.log{max-height:180px;overflow:auto;font-size:13px;color:#cbd5e1}.log div{padding:5px 0;border-bottom:1px solid #263247}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div><h1>🚛 Firma Transportowa</h1><div class="sub">Bez gemów. Bez P2W. Po prostu wożenie.</div></div><button class="action secondary" onclick="resetGame()">↻</button></header>
+<div id="screen"></div>
+</div>
+<nav id="nav">
+<button onclick="tab('home')">🏢<br>Firma</button>
+<button onclick="tab('jobs')">📋<br>Zlecenia</button>
+<button onclick="tab('fleet')">🚛<br>Flota</button>
+<button onclick="tab('drivers')">👨‍🔧<br>Kierowcy</button>
+</nav>
+<script>
+const routes=[
+["Wrocław","Berlin",680,420,540],["Poznań","Hamburg",720,450,560],["Łódź","Praga",520,330,430],
+["Katowice","Bratysława",470,290,390],["Gdańsk","Rotterdam",1450,880,1080],["Warszawa","Frankfurt",1250,760,940],
+["Kraków","Wiedeń",590,360,470],["Szczecin","Kopenhaga",780,470,590]
+];
+const cargos=["AGD","palety FMCG","części samochodowe","materiały budowlane","elektronika","opakowania"];
+let S=JSON.parse(localStorage.getItem("ftgame")||"null")||{
+money:150000,day:1,rep:50,tab:"home",
+truck:{name:"MAN TGX 18.500",year:2018,km:740000,hp:500,cons:29,value:185000,condition:78},
+drivers:[{name:"Marek",exp:65,economy:62,safety:72,salary:3000}],
+jobs:[],log:["Dzień 1: firma została otwarta. Jeden MAN czeka na trasę."]
+};
+function save(){localStorage.setItem("ftgame",JSON.stringify(S))}
+function money(n){return Math.round(n).toLocaleString("pl-PL")+" zł"}
+function genJobs(){
+ S.jobs=routes.map((r,i)=>({id:i,from:r[0],to:r[1],km:r[2],pay:r[3]+Math.round(Math.random()*r[4]),cargo:cargos[Math.floor(Math.random()*cargos.length)],weight:Math.round(8+Math.random()*15)}));
+}
+function log(x){S.log.unshift(x);S.log=S.log.slice(0,30)}
+function tab(t){S.tab=t;render()}
+function endDay(){
+ const t=S.truck;
+ if(t.condition<30){log("❌ Ciężarówka jest w zbyt złym stanie.");return}
+ const fixed=900;
+ S.money-=fixed; S.day++; t.condition=Math.max(0,t.condition-1); t.km+=120;
+ genJobs(); log(`🌙 Koniec dnia ${S.day-1}. Koszty stałe: ${money(fixed)}.`);
+ save();render()
+}
+function takeJob(id){
+ const j=S.jobs.find(x=>x.id===id); if(!j)return;
+ const t=S.truck, fuel=j.km*t.cons/100, fuelCost=fuel*6.5, toll=j.km*.34, driver=120;
+ const profit=j.pay-fuelCost-toll-driver;
+ if(S.money+profit<0)return;
+ S.money+=profit; t.km+=j.km; t.condition=Math.max(0,t.condition-Math.max(1,Math.round(j.km/700)));
+ S.rep=Math.min(100,S.rep+(profit>0?1:0)); log(`📦 ${j.from} → ${j.to}: ${money(profit)} zysku.`);
+ S.jobs=S.jobs.filter(x=>x.id!==id); save();render()
+}
+function repair(){
+ const cost=Math.round((100-S.truck.condition)*420);
+ if(S.money<cost)return;
+ S.money-=cost;S.truck.condition=100;log(`🔧 Serwis: ${money(cost)}.`);save();render()
+}
+function buyTruck(){
+ if(S.money<215000)return;
+ S.money-=215000;S.truck={name:"DAF XG 480",year:2022,km:210000,hp:480,cons:27,value:290000,condition:100};
+ log("🚛 Kupiono DAF XG 480.");save();render()
+}
+function hire(){
+ if(S.money<5000)return;
+ const names=["Piotr","Kamil","Tomek","Bartek","Adrian"];let n=names[S.drivers.length%names.length];
+ S.money-=5000;S.drivers.push({name:n,exp:45,economy:55,safety:60,salary:3000});log(`👨‍🔧 Zatrudniono kierowcę ${n}.`);save();render()
+}
+function resetGame(){if(confirm("Na pewno wyzerować zapis?")){localStorage.removeItem("ftgame");location.reload()}}
+function home(){
+ return `<div class="stats"><div class="stat"><div class="label">KASA</div><div class="value">${money(S.money)}</div></div><div class="stat"><div class="label">DZIEŃ</div><div class="value">${S.day}</div></div><div class="stat"><div class="label">REPUTACJA</div><div class="value">${S.rep}/100</div></div></div>
+ <div class="card"><div class="row"><div><b>${S.truck.name}</b><div class="muted small">${S.truck.year} • ${S.truck.km.toLocaleString("pl-PL")} km • ${S.truck.hp} KM</div></div><b>${S.truck.condition}%</b></div></div>
+ <div class="card"><h3>Dzień roboczy</h3><p class="muted">Przyjmuj ładunki, zarabiaj, naprawiaj sprzęt i rozbudowuj firmę.</p><button class="action" onclick="endDay()">🌙 Zakończ dzień</button></div>
+ <div class="card"><h3>Dziennik</h3><div class="log">${S.log.map(x=>`<div>${x}</div>`).join("")}</div></div>`;
+}
+function jobs(){
+ if(!S.jobs.length)genJobs();
+ return `<div class="card"><div class="row"><div><h2 style="margin:0">Zlecenia</h2><div class="muted small">Koszty liczone automatycznie: paliwo + opłaty + kierowca.</div></div><button class="action" onclick="genJobs();render()">↻</button></div></div>`+
+ S.jobs.map(j=>`<div class="card job"><h3>${j.from} → ${j.to}</h3><div class="muted">${j.cargo} • ${j.weight} t • ${j.km} km</div><div class="row" style="margin-top:10px"><b>${money(j.pay)}</b><button class="action" onclick="takeJob(${j.id})">Przyjmij</button></div></div>`).join("");
+}
+function fleet(){
+ const repairCost=Math.round((100-S.truck.condition)*420);
+ return `<div class="card"><h2>Flota</h2><div class="row"><div><b>${S.truck.name}</b><div class="muted">${S.truck.year} • ${S.truck.hp} KM</div></div><b>${S.truck.condition}%</b></div>
+ <p class="small muted">Przebieg: ${S.truck.km.toLocaleString("pl-PL")} km • spalanie: ${S.truck.cons} l/100 km • wartość: ${money(S.truck.value)}</p>
+ <div class="grid2"><button class="action" ${repairCost<=0||S.money<repairCost?"disabled":""} onclick="repair()">🔧 Napraw ${money(repairCost)}</button>
+ <button class="action" ${S.money<215000?"disabled":""} onclick="buyTruck()">🚛 DAF XG • 215k</button></div></div>`;
+}
+function drivers(){
+ return `<div class="card"><div class="row"><div><h2 style="margin:0">Kierowcy</h2><div class="muted small">Pensja: 3 000 zł / miesiąc</div></div><button class="action" ${S.money<5000?"disabled":""} onclick="hire()">+ Zatrudnij</button></div></div>`+
+ S.drivers.map(d=>`<div class="card"><b>👨‍🔧 ${d.name}</b><div class="grid2 small" style="margin-top:10px"><div>Doświadczenie: ${d.exp}</div><div>Ekonomia: ${d.economy}</div><div>Bezpieczeństwo: ${d.safety}</div><div>Pensja: ${money(d.salary)}</div></div></div>`).join("");
+}
+function render(){
+ let body=S.tab==="home"?home():S.tab==="jobs"?jobs():S.tab==="fleet"?fleet():drivers();
+ document.getElementById("screen").innerHTML=body;
+ document.querySelectorAll("#nav button").forEach((b,i)=>b.classList.toggle("active",["home","jobs","fleet","drivers"][i]===S.tab));
+ save()
+}
+render();
+</script>
+</body>
+</html>
