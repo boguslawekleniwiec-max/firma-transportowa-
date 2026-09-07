@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<title>Firma Transportowa 3.2.2 — Czytelny interfejs</title>
+<title>Firma Transportowa 4.0 — Czytelny interfejs</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <style>
@@ -64,12 +64,43 @@ button{min-height:44px;padding:10px 13px;border-radius:11px}button.secondary{bac
 .more-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.more-grid button{height:76px;background:#17243a;border:1px solid #30415e;font-size:14px}
 .tabs{gap:4px}.tabs button{font-size:10px}
 @media(max-width:699px){.wrap{padding-left:11px;padding-right:11px}.top{margin-left:-11px;margin-right:-11px;padding-left:11px;padding-right:11px}.grid{grid-template-columns:1fr 1fr}.card{padding:14px}.card h2{font-size:16px}.top h1{font-size:18px}.top .sub{font-size:10px}.tabs button{flex:1 1 20%;width:20%;min-width:0}.tabs button{height:55px}.tabs button:first-line{font-size:17px}}
+
+/* 4.0 — czytelny interfejs: mniej dekoracji, mocna hierarchia, jedna rzecz naraz */
+:root{
+ --bg:#080c14;--surface:#121925;--surface2:#171f2d;--line:#2a3547;
+ --text:#f5f7fb;--muted:#9aa6b8;--accent:#4f8cff;--good:#35d07f;--warn:#f2b84b;--danger:#ef6b73;
+}
+html,body{background:var(--bg)!important;color:var(--text)}
+body{font-size:16px;line-height:1.45;letter-spacing:0}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px calc(104px + env(safe-area-inset-bottom))}
+.top{position:sticky;top:0;z-index:90;margin:0 -16px 18px;padding:18px 16px 14px;background:#080c14;border-bottom:1px solid #202a3a;box-shadow:0 8px 20px rgba(0,0,0,.18)}
+.top h1{font-size:22px;line-height:1.2;margin:0 0 4px;font-weight:850;letter-spacing:-.3px}.top .sub{font-size:12px;color:#8e9aac}.top>button{font-size:12px;min-height:42px}
+.card{background:var(--surface);border:1px solid var(--line);box-shadow:none;border-radius:14px;padding:16px}
+.card+.card{margin-top:12px}.card h2{font-size:19px;line-height:1.25;margin:0 0 10px}.card h3{font-size:16px;margin:0 0 7px}.muted{color:var(--muted)}
+.grid,.cols{display:block;margin:0}.grid>.card,.cols>div>.card,.cols>.card{margin-top:12px}
+button{min-height:44px;border-radius:10px;padding:10px 14px;background:var(--accent);color:#fff;font-size:14px;font-weight:800;box-shadow:none}
+button.secondary{background:#273142;color:#f0f3f8;border:1px solid #39465a}button.warn{background:#8d641c}button.danger{background:#8e3138}button:disabled{opacity:.45}
+.row,.button-row,.action-row{display:flex;gap:8px;flex-wrap:wrap}.row>button,.button-row>button,.action-row>button{flex:1 1 140px}
+.progress{height:8px;background:#273244;border-radius:99px;overflow:hidden;margin:8px 0}.progress>i{background:var(--accent);border-radius:99px}
+.pill{background:#273244;border:0;color:#dce4ef;padding:4px 8px;font-size:11px}.notice{background:#151e2c;border:1px solid #2b3749;border-left:3px solid var(--accent);box-shadow:none;padding:10px 12px;margin:8px 0}
+.tabs{height:auto;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding:6px 8px calc(6px + env(safe-area-inset-bottom));background:#0b1019f5;border-top:1px solid #202a3a;box-shadow:0 -8px 22px rgba(0,0,0,.28);backdrop-filter:blur(14px)}
+.tabs button,.tabs button.active{width:auto!important;min-width:0!important;height:54px;border-radius:10px;padding:5px 2px;background:transparent;border:0;box-shadow:none;color:#8f9bad;font-size:10px;line-height:1.15}.tabs button.active{background:#1b3153;color:#fff}.tabs button:first-line{font-size:17px}
+#fleetMap{height:52vh;min-height:340px;border-radius:12px;border:1px solid var(--line)}
+.buy-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:10px}.buy-card+.buy-card{margin-top:8px}.buy-card .price{font-size:16px}.more-grid{grid-template-columns:1fr 1fr;gap:8px}.more-grid button{height:68px;background:var(--surface2);border:1px solid var(--line)}
+.log{max-height:260px;overflow:auto}.small{font-size:12px}details{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:0 14px}details+details{margin-top:10px}summary{padding:14px 0;font-weight:800;cursor:pointer}details[open] summary{border-bottom:1px solid var(--line);margin-bottom:10px}
+/* HOME 4.0 */
+.home{display:block}.hero-kpis{display:grid;grid-template-columns:1.5fr .7fr .9fr;gap:8px;margin-bottom:12px}.hero-kpis>div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px}.hero-kpis span,.two-metrics span,.status-grid span,.meter-label span{display:block;color:var(--muted);font-size:11px;font-weight:750}.hero-kpis strong{display:block;font-size:19px;margin-top:3px}.main-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}.eyebrow{font-size:10px;letter-spacing:1px;color:#7f8da2;font-weight:900;margin-bottom:7px}.title-row{display:flex;align-items:center;justify-content:space-between;gap:10px}.title-row h2{margin:0;font-size:20px}.status{font-size:10px;font-weight:900;padding:5px 7px;border-radius:6px;white-space:nowrap}.status.active{background:#163a29;color:#63e39b}.status.info{background:#20375c;color:#8eb7ff}.truck-meta{color:#a6b1c1;font-size:12px;margin:5px 0 14px}.meter-label{display:flex;justify-content:space-between;font-size:12px}.two-metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.two-metrics>div{background:#0d141f;border-radius:9px;padding:9px 10px}.two-metrics b{display:block;margin-top:2px;font-size:15px}.route-big{font-size:20px;font-weight:850;margin:5px 0 2px;line-height:1.25}.route-big span{color:var(--accent);padding:0 4px}.route-distance{font-size:13px;color:#b4bfce;margin:0}.job-hero .action-row .row{width:100%}.job-hero .action-row{display:block}.job-hero .action-row>p{margin:0}.job-hero .action-row>.pill,.job-hero .action-row>.progress{display:none}.job-hero .action-row .row{margin-top:10px}.empty-state{display:flex;flex-direction:column;gap:3px;color:#aab5c5}.empty-state b{color:#f1f4f9}.status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.status-grid>div{background:#0d141f;border-radius:9px;padding:10px}.status-grid b{font-size:16px;display:inline-block;margin-top:3px}.status-grid small{color:#778498;margin-left:3px}.alert-list{display:grid;gap:7px;margin:0 0 12px}.alert{background:#2b2113;border:1px solid #61481d;color:#f5cf7a;border-radius:10px;padding:11px 12px;font-size:13px;font-weight:750}.ok-state{background:#10271b;border:1px solid #244b34;color:#72d79c;border-radius:10px;padding:11px 12px;margin-bottom:12px;font-size:13px;font-weight:800}.compact-detail{padding:8px 0;border-bottom:1px solid #273142;font-size:13px}.compact-detail:last-of-type{border-bottom:0}.clean-log div{padding:8px 0;border-bottom:1px solid #273142;font-size:12px}.clean-log div:last-child{border-bottom:0}
+/* hide redundant nested dashboard cards on company; details hold secondary information */
+.home .main-card .card{background:transparent;border:0;padding:0;box-shadow:none}.home .main-card .card+.card{margin-top:0}
+@media(max-width:699px){.wrap{padding-left:16px;padding-right:16px}.top{margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px}.hero-kpis{grid-template-columns:1.35fr .7fr .9fr}.hero-kpis>div{padding:10px 9px}.hero-kpis strong{font-size:17px}.title-row h2{font-size:18px}.route-big{font-size:18px}.main-card{padding:15px}.status-grid b{font-size:15px}.grid{grid-template-columns:1fr}.more-grid{grid-template-columns:1fr 1fr}.tabs button{font-size:10px}}
+@media(min-width:700px){.wrap{max-width:760px}.top{margin-left:-16px;margin-right:-16px}.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}.cols>div>.card{margin-top:0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid>.card{margin-top:0}}
+
 </style>
 </head>
 <body>
 <div class="wrap">
 <div class="top">
-  <div><h1>🚛 Firma Transportowa <span style="color:#60a5fa">3.2.2</span></h1><div class="sub">Panel kierowcy • flota • mapa • zlecenia • finanse</div></div>
+  <div><h1>🚛 Firma Transportowa <span style="color:#60a5fa">4.0</span></h1><div class="sub">Panel kierowcy • flota • mapa • zlecenia • finanse</div></div>
   <button class="secondary" onclick="resetGame()">↻ Reset</button>
 </div>
 <div id="app"></div>
@@ -418,24 +449,57 @@ function hireDispatcher(){if(state.base.dispatchers>=2){alert('Masz już maksyma
 
 function company(){
  const t=truck(),d=driver(),j=state.activeJob;
- return `<div class="grid">
- <div class="card stat"><span class="muted">KASA</span><b>${money(state.money)}</b></div>
- <div class="card stat"><span class="muted">DZIEŃ</span><b>${state.day}</b></div>
- <div class="card stat"><span class="muted">REPUTACJA</span><b>${state.rep}/100</b></div>
- <div class="card stat"><span class="muted">JAZDA TYG.</span><b>${fmt(state.weekDrive)}</b><span class="muted">limit 56 h</span></div>
- </div>
- <div class="cols"><div>
- <div class="card"><h2>🚛 ${t.model}</h2><div class="muted">${t.year} • ${Math.round(t.km).toLocaleString('pl-PL')} km • ${t.power} KM</div>
- <p>Stan <b>${Math.round(t.condition)}%</b> • paliwo <b>${Math.round(t.fuel)}%</b></p>
- <div class="progress"><i style="width:${t.condition}%"></i></div></div>
- <div class="card"><h2>📦 Aktualna operacja</h2>${j?jobProgress(j):`<p class="muted">Brak aktywnego zlecenia. Wejdź w Giełdę ładunków.</p>`}</div>
- <div class="card"><h2>📝 Dziennik</h2><div class="log">${state.logs.map(x=>'<div class="notice small">'+x+'</div>').join('')}</div></div>
- </div>
- <div><div class="card"><h2>⏱️ Tachograf</h2><p>Jazda dziś: <b>${fmt(d.driveToday)}</b> / 9 h</p><div class="progress"><i style="width:${d.driveToday/540*100}%"></i></div>
- <p>Od pauzy: <b>${fmt(d.shift)}</b> / 4 h 30</p><div class="progress"><i style="width:${d.shift/270*100}%"></i></div>
- <p class="small muted">W grze stosujemy zasady UE: po maks. 4 h 30 min jazdy potrzebna jest co najmniej 45-minutowa pauza; dobowy limit jazdy to 9 h, z możliwością 10 h dwa razy w tygodniu.</p>
- <div class="row"><button onclick="breakTime(45)">⏸️ Pauza 45 min</button><button class="secondary" onclick="rest(11)">🛏️ Odpoczynek 11 h</button></div></div>
- <div class="card"><h2>☕🚬 Kierowca</h2><p>Kawa: <b>${state.coffee}</b> • otwarta kawa: <b>${state.coffeeSips}/4 łyków pozostało</b> • Papierosy: <b>${state.cigarettes} szt.</b></p><button class="secondary" onclick="buyConsumable('coffee')">☕ Kup kawę 8 zł</button> <button class="secondary" onclick="buyConsumable('cigarettes')">🚬 Paczka 20 szt. 25 zł</button><br><button class="secondary" onclick="useConsumable('coffee')">☕ Łyk kawy</button> <button class="secondary" onclick="useConsumable('cigarettes')">🚬 Papieros</button><p class="muted">Kawa nie znika od razu — jeden kubek wystarcza na 5 łyków. Papierosy kupujesz paczkami po 20 sztuk.</p></div><div class="card"><h2>🌙 Koniec dnia</h2><p class="muted">Koszty stałe są pobierane przy zamknięciu dnia.</p><button onclick="endDay()">Zakończ dzień</button></div><div class="card"><h2>🏢 Firma</h2><p>Baza: <b>${state.base.name}</b> • magazyn ${state.base.warehouse}/2 • warsztat ${state.base.workshop}/2 • dyspozytorzy ${state.base.dispatchers}/2</p><button class="secondary" onclick="buyBaseUpgrade('warehouse')">🏭 Magazyn 180 tys.</button> <button class="secondary" onclick="buyBaseUpgrade('workshop')">🔧 Warsztat 220 tys.</button><br><button class="secondary" onclick="buyBaseUpgrade('dispatchers')">📞 Dyspozytor 120 tys.</button></div><div class="card"><h2>🏦 Finansowanie</h2><p>Aktywny kredyt: ${state.loans?.length?money(state.loans[0].balance):'brak'}</p><button class="secondary" onclick="takeLoan(100000)">Pożycz 100 tys.</button> <button class="secondary" onclick="payLoan()">Spłać ratę</button></div></div></div>`
+ const alerts=[];
+ if(t.fuel<25) alerts.push('⛽ Paliwo jest niskie — warto zatankować.');
+ if(t.condition<40) alerts.push('🔧 Ciężarówka ma niski stan — rozważ serwis.');
+ if(d.shift>=240) alerts.push('⏱️ Zbliża się obowiązkowa pauza.');
+ return `<div class="home">
+   <section class="hero-kpis">
+    <div><span>Gotówka</span><strong>${money(state.money)}</strong></div>
+    <div><span>Dzień</span><strong>${state.day}</strong></div>
+    <div><span>Reputacja</span><strong>${state.rep}/100</strong></div>
+   </section>
+
+   <section class="main-card truck-hero">
+    <div class="eyebrow">AKTYWNY ZESTAW</div>
+    <div class="title-row"><h2>🚛 ${t.model}</h2><span class="status active">AKTYWNA</span></div>
+    <div class="truck-meta">${t.plate||'DWR'} · ${t.year} · ${Math.round(t.km).toLocaleString('pl-PL')} km · ${t.power} KM</div>
+    <div class="meter-label"><span>Stan</span><b>${Math.round(t.condition)}%</b></div>
+    <div class="progress"><i style="width:${t.condition}%"></i></div>
+    <div class="two-metrics"><div><span>Paliwo</span><b>${Math.round(t.fuel)}%</b></div><div><span>Kierowca</span><b>${d.name}</b></div></div>
+   </section>
+
+   <section class="main-card job-hero">
+    <div class="eyebrow">AKTUALNE ZLECENIE</div>
+    ${j?`<div class="title-row"><h2>📦 ${j.cargo}</h2><span class="status info">${j.tons} t</span></div>
+    <p class="route-big">${hub(j.from).name} <span>→</span> ${hub(j.to).name}</p>
+    <p class="route-distance">${Math.round(state.progress)} / ${j.dist} km</p>
+    <div class="progress"><i style="width:${Math.min(100,state.progress/Math.max(1,j.dist)*100)}%"></i></div>
+    <div class="action-row">${jobProgress(j)}</div>`:`<div class="empty-state"><b>Brak aktywnego zlecenia</b><span>Wybierz ładunek z zakładki „Zlecenia”.</span></div>`}
+   </section>
+
+   <section class="main-card quick-status">
+    <div class="eyebrow">SZYBKI STATUS</div>
+    <div class="status-grid">
+      <div><span>Jazda dziś</span><b>${fmt(d.driveToday)}</b><small>/ 9 h</small></div>
+      <div><span>Jazda tyg.</span><b>${fmt(state.weekDrive)}</b><small>/ 56 h</small></div>
+      <div><span>Od pauzy</span><b>${fmt(d.shift)}</b><small>/ 4:30</small></div>
+    </div>
+   </section>
+
+   ${alerts.length?`<section class="alert-list">${alerts.map(a=>`<div class="alert">${a}</div>`).join('')}</section>`:`<section class="ok-state">✓ Wszystko w porządku</section>`}
+
+   <details class="secondary-panel"><summary>☕ Kierowca i tachograf</summary>
+    <div class="compact-detail"><b>☕ Kawa:</b> ${state.coffee} · otwarta: ${state.coffeeSips}/4 łyków</div>
+    <div class="compact-detail"><b>🚬 Papierosy:</b> ${state.cigarettes} szt.</div>
+    <div class="compact-detail"><b>⏱️ Jazda dziś:</b> ${fmt(d.driveToday)} / 9 h · od pauzy ${fmt(d.shift)} / 4:30</div>
+    <div class="button-row"><button onclick="breakTime(45)">Pauza 45 min</button><button class="secondary" onclick="rest(11)">Odpoczynek 11 h</button></div>
+   </details>
+
+   <details class="secondary-panel"><summary>📝 Dziennik firmy</summary>
+    <div class="log clean-log">${state.logs.slice(0,8).map(x=>'<div>'+x+'</div>').join('')||'<div class="muted">Brak wpisów.</div>'}</div>
+   </details>
+ </div>`
 }
 function jobProgress(j){
  const p=Math.min(100,j.dist?state.progress/j.dist*100:0);
