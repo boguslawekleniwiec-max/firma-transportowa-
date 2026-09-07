@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<title>Firma Transportowa 3.2 — Nowy interfejs</title>
+<title>Firma Transportowa 3.2.2 — Czytelny interfejs</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <style>
@@ -44,12 +44,32 @@ details{background:rgba(255,255,255,.015);border-radius:12px}summary{cursor:poin
 @media(max-width:699px){h1{font-size:18px}.cols{grid-template-columns:1fr}.card{padding:14px}.row{gap:7px}.row>button{flex:1 1 auto}.list .card{border-radius:16px}.tabs button{flex:0 0 calc(25% - 4px);width:calc(25% - 4px)}}
 @media(min-width:700px){.wrap{padding-bottom:90px}.tabs{padding:7px 10px}.tabs button{height:48px;font-size:12px}.tabs button:first-line{font-size:18px}}
 
+
+/* 3.2.2 — czytelność mobile-first */
+:root{--surface:#121a2a;--surface2:#172238;--border:#30415e;--divider:#2a3952}
+body{font-size:15px;line-height:1.45}
+.card{background:var(--surface);border:1px solid var(--border);box-shadow:none;border-radius:16px;padding:16px}
+.card + .card{margin-top:12px}
+.card h2{font-size:17px;line-height:1.25;margin-bottom:10px}.card h3{font-size:15px;line-height:1.3}
+.card p{margin:8px 0}.muted{color:#aab7cb}.small{font-size:12px}
+.stat{background:#0f1929;border-color:#31445f;padding:13px}.stat b{font-size:21px;line-height:1.1;margin:3px 0 2px}
+.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0}
+.row{gap:10px}.row>button{min-height:44px}
+.progress{height:9px;margin:8px 0}.notice{padding:11px 12px;margin:8px 0;background:#101a2b;border:1px solid #2a3a55;border-left:4px solid #3b82f6}
+button{min-height:44px;padding:10px 13px;border-radius:11px}button.secondary{background:#263650;border:1px solid #3a4c69}
+.pill{font-size:11px;background:#1b2a43;border:1px solid #344966}
+.section-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 8px}.section-title h2{margin:0}
+.buy-card{background:#101a2b;border:1px solid #31445f;border-radius:14px;padding:12px;margin-top:8px}.buy-card .price{font-size:16px;font-weight:900}.owned{color:#34d399;font-weight:900}.active-mark{color:#60a5fa;font-weight:900}
+.toast{position:fixed;left:12px;right:12px;top:74px;z-index:250;background:#12301f;border:1px solid #2e8b57;color:#eafff2;border-radius:12px;padding:12px 14px;box-shadow:0 12px 30px #0006;font-weight:800}
+.more-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.more-grid button{height:76px;background:#17243a;border:1px solid #30415e;font-size:14px}
+.tabs{gap:4px}.tabs button{font-size:10px}
+@media(max-width:699px){.wrap{padding-left:11px;padding-right:11px}.top{margin-left:-11px;margin-right:-11px;padding-left:11px;padding-right:11px}.grid{grid-template-columns:1fr 1fr}.card{padding:14px}.card h2{font-size:16px}.top h1{font-size:18px}.top .sub{font-size:10px}.tabs button{flex:1 1 20%;width:20%;min-width:0}.tabs button{height:55px}.tabs button:first-line{font-size:17px}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <div class="top">
-  <div><h1>🚛 Firma Transportowa <span style="color:#60a5fa">3.2</span></h1><div class="sub">Panel kierowcy • flota • mapa • zlecenia • finanse</div></div>
+  <div><h1>🚛 Firma Transportowa <span style="color:#60a5fa">3.2.2</span></h1><div class="sub">Panel kierowcy • flota • mapa • zlecenia • finanse</div></div>
   <button class="secondary" onclick="resetGame()">↻ Reset</button>
 </div>
 <div id="app"></div>
@@ -57,12 +77,9 @@ details{background:rgba(255,255,255,.015);border-radius:12px}summary{cursor:poin
 <div class="tabs">
 <button id="t-company" onclick="tab='company';render()">🏢<br>Firma</button>
 <button id="t-jobs" onclick="tab='jobs';render()">📋<br>Zlecenia</button>
-<button id="t-hubs" onclick="tab='hubs';render()">🏭<br>Huby</button>
-<button id="t-fleet" onclick="tab='fleet';render()">🚛<br>Flota</button>
 <button id="t-map" onclick="tab='map';render()">🗺️<br>Mapa</button>
-<button id="t-drivers" onclick="tab='drivers';render()">👨‍🔧<br>Kierowcy</button>
-<button id="t-overload" onclick="tab='overload';render()">🏗️<br>Gabaryty</button>
-<button id="t-route" onclick="tab='route';render()">🛣️<br>Trasa</button>
+<button id="t-fleet" onclick="tab='fleet';render()">🚛<br>Flota</button>
+<button id="t-more" onclick="tab='more';render()">☰<br>Więcej</button>
 </div>
 <script>
 const HUBS=[
@@ -135,10 +152,10 @@ function fresh(){
    trailers:[{id:1,type:'Firanka',cap:24,value:65000,condition:88}],
    jobs:[],activeJob:null,progress:0,loaded:false,hub:null,logs:['Dzień 1: firma została otwarta. Jeden MAN czeka na trasę.'],
    hubState:{},lastEvent:'',routeVersion:2,gameVersion:3,activeTrailerId:1,contracts:[],loans:[],leasePayments:[],events:[],achievements:[],ratings:[],base:{name:'Krzyżowice',level:1,warehouse:0,workshop:0,dispatchers:0},
-   break15:false,break45Due:false,energy:100,hunger:20,morale:75,routeRisk:0,weekRestHours:0,nightWork:0,adrLicense:false,routeGeometries:{}
+   lastPurchase:'',break15:false,break45Due:false,energy:100,hunger:20,morale:75,routeRisk:0,weekRestHours:0,nightWork:0,adrLicense:false,routeGeometries:{}
  };
 }
-function load(){try{const x=JSON.parse(localStorage.ft20)||fresh(); if(x.companyKm==null)x.companyKm=0; if(x.driverId==null)x.driverId=x.drivers?.[0]?.id||1; if(x.truckId==null)x.truckId=x.trucks?.[0]?.id||1; if(x.plateSeq==null)x.plateSeq=1; if(x.coffee==null)x.coffee=0; if(x.coffeeSips==null)x.coffeeSips=0; if(x.cigarettes==null)x.cigarettes=0; if(!x.routeGeometries)x.routeGeometries={}; x.trucks?.forEach((t,i)=>{if(!t.plate)t.plate='DWR '+String(i+1).padStart(5,'0'); if(!t.mods)t.mods={engine:0,tires:0,tank:0,comfort:0}; if(!t.currentHub)t.currentHub=x.hub||'KRZ'});
+function load(){try{const x=JSON.parse(localStorage.ft20)||fresh(); if(x.companyKm==null)x.companyKm=0; if(x.driverId==null)x.driverId=x.drivers?.[0]?.id||1; if(x.truckId==null)x.truckId=x.trucks?.[0]?.id||1; if(x.plateSeq==null)x.plateSeq=1; if(x.coffee==null)x.coffee=0; if(x.coffeeSips==null)x.coffeeSips=0; if(x.cigarettes==null)x.cigarettes=0; if(x.lastPurchase==null)x.lastPurchase=''; if(!x.routeGeometries)x.routeGeometries={}; x.trucks?.forEach((t,i)=>{if(!t.plate)t.plate='DWR '+String(i+1).padStart(5,'0'); if(!t.mods)t.mods={engine:0,tires:0,tank:0,comfort:0}; if(!t.currentHub)t.currentHub=x.hub||'KRZ'});
  if(!x.gameVersion)x.gameVersion=3; if(!x.trailers)x.trailers=[{id:1,type:'Firanka',cap:24,value:65000,condition:88}]; if(x.activeTrailerId==null)x.activeTrailerId=x.trailers[0]?.id||1;
  if(!x.contracts)x.contracts=[]; if(!x.loans)x.loans=[]; if(!x.leasePayments)x.leasePayments=[]; if(!x.events)x.events=[]; if(!x.achievements)x.achievements=[]; if(!x.ratings)x.ratings=[];
  if(!x.base)x.base={name:'Krzyżowice',level:1,warehouse:0,workshop:0,dispatchers:0};
@@ -219,11 +236,13 @@ function useConsumable(type){
  if(type==='coffee'){
    if(state.coffeeSips>0){
      state.coffeeSips--;
-     log('Łyk kawy ☕.');
+     state.energy=Math.min(100,state.energy+4);
+     log('☕ Łyk kawy: +4 energii. Energia kierowcy '+Math.round(state.energy)+'%.');
    } else if(state.coffee>0){
      state.coffee--;
      state.coffeeSips=4;
-     log('Otworzono kawę i wypito pierwszy łyk ☕. Zostały 4 łyki.');
+     state.energy=Math.min(100,state.energy+4);
+     log('☕ Otworzono kawę: pierwszy łyk +4 energii. Zostały 4 łyki.');
    } else {alert('Nie masz kawy na stanie.');return}
  } else {
    if(!state.cigarettes){alert('Nie masz papierosów na stanie.');return}
@@ -288,7 +307,7 @@ function weeklyRest(hours){
  if(hours<24){alert('Minimalny skrócony odpoczynek tygodniowy to 24 h.');return}
  state.day+=Math.round(hours/24);driver().driveWeek=0;state.weekDrive=0;driver().driveToday=0;driver().shift=0;state.weekRestHours=hours;state.energy=100;state.morale=Math.min(100,state.morale+20);state.routeRisk=0;state.money-=500;log('📅 Odpoczynek tygodniowy '+hours+' h. Tydzień pracy zresetowany.');save();render()
 }
-function fmt(m){let h=Math.floor(m/60),x=m%60;return h+'h '+String(x).padStart(2,'0')+'m'}
+function fmt(m){m=Math.max(0,Math.round(Number(m)||0));let h=Math.floor(m/60),x=m%60;return h+'h '+String(x).padStart(2,'0')+'m'}
 
 
 function jobCosts(j){
@@ -342,8 +361,11 @@ function endDay(){
 }
 function buyTruck(i){
  const x=TRUCKS[i];if(state.money<x.price){alert('Za mało gotówki.');return}
- state.money-=x.price;const newTruckId=Date.now();state.trucks.push({id:newTruckId,model:x.name,year:x.year,km:120000,power:x.power,cons:x.cons,condition:96,value:x.price,fuel:90,driverId:null,plate:'DWR '+String(++state.plateSeq).padStart(5,'0'),mods:{engine:0,tires:0,tank:0,comfort:0},currentHub:activeTruckHub()}); state.truckId=newTruckId;
- log('Kupiono '+x.name+' za '+money(x.price)+'.');save();render()
+ if(!confirm('Kupić '+x.name+' za '+money(x.price)+'?'))return;
+ state.money-=x.price;const newTruckId=Date.now();const newPlate='DWR '+String(++state.plateSeq).padStart(5,'0');
+ state.trucks.push({id:newTruckId,model:x.name,year:x.year,km:120000,power:x.power,cons:x.cons,condition:96,value:x.price,fuel:90,driverId:null,plate:newPlate,mods:{engine:0,tires:0,tank:0,comfort:0},currentHub:activeTruckHub()});
+ state.lastPurchase='Kupiono '+x.name+' • '+newPlate+' • '+money(x.price)+'. Ciężarówka została dodana do floty. Aktywna nadal pozostaje poprzednia.';
+ log('🚛 KUPIONO '+x.name+' za '+money(x.price)+'. Nowa ciężarówka: '+newPlate+'.');save();render()
 }
 function hire(){
  const cost=8500;if(state.money<cost){alert('Za mało gotówki.');return}
@@ -458,10 +480,12 @@ function hubs(){
  <div class="grid">${HUBS.map(h=>{let s=state.hubState[h.id];return `<div class="card"><h3>🏭 ${h.name}</h3><span class="pill">${h.country} • ${h.type}</span><p>Przepustowość: <b>${h.capacity}%</b><br>Parking: <b>${h.parking}</b> miejsc<br>Kongestia: <b class="${s.congestion>70?'bad':''}">${s.congestion}%</b></p><div class="progress"><i style="width:${s.congestion}%"></i></div><p class="small muted">Usługi: ${h.services.join(' • ')}</p></div>`}).join('')}</div>`
 }
 function fleet(){
- return `<div class="card"><h2>🚛 Flota</h2><p class="muted">Kupuj ciężarówki, tankuj i pilnuj stanu technicznego.</p></div>
- <div class="list">${state.trucks.map(t=>`<div class="card"><div class="row"><div><h3>${t.model}</h3><div class="muted">${t.year} • ${Math.round(t.km).toLocaleString('pl-PL')} km • ${t.power} KM</div></div><span class="pill">Stan ${Math.round(t.condition)}%</span></div><p>Tablica: <b>${t.plate||'DWR 00001'}</b><br>Paliwo ${Math.round(t.fuel)}% • spalanie ${t.cons} l/100 km</p><button ${state.truckId===t.id?'disabled':''} onclick="selectTruck(${t.id})">${state.truckId===t.id?'🚛 Aktywny':'Użyj tego zestawu'}</button> <button class="secondary" onclick="refuel(${t.id})">⛽ Tankuj</button> <button class="secondary" onclick="repair(${t.id})">🔧 Serwis</button> <button class="secondary" onclick="plate(${t.id})">🔤 Tablica</button><details style="margin-top:10px"><summary>🔧 Modyfikacje</summary><p class="small muted">Silnik +80 KM • opony -1 l/100 km • zbiornik + paliwo • kabina + stan</p><button class="secondary" onclick="modifyTruck(${t.id},'engine')">Silnik 85 tys.</button> <button class="secondary" onclick="modifyTruck(${t.id},'tires')">Opony 18 tys.</button> <button class="secondary" onclick="modifyTruck(${t.id},'tank')">Zbiornik 12 tys.</button> <button class="secondary" onclick="modifyTruck(${t.id},'comfort')">Kabina 22 tys.</button></details></div>`).join('')}</div>
- <div class="card"><h2>🧰 Naczepy</h2><p>Aktywna: <b>${activeTrailer()?.type||'brak'}</b></p><div class="list">${state.trailers.map(t=>`<div class="notice small"><b>${t.type}</b> • ${t.cap} t • stan ${Math.round(t.condition)}% <button ${state.activeTrailerId===t.id?'disabled':''} class="secondary" onclick="selectTrailer(${t.id})">${state.activeTrailerId===t.id?'Aktywna':'Podepnij'}</button></div>`).join('')}</div><details><summary>🛒 Kup naczepę</summary>${TRAILERS.map((x,i)=>`<div class="row" style="padding:8px 0;border-bottom:1px solid #263650"><span><b>${x.type}</b><br><span class="muted">${x.desc}</span></span><span><b>${money(x.price)}</b> <button onclick="buyTrailer(${i})">Kup</button></span></div>`).join('')}</details></div>
- <div class="card"><h2>🛒 Rynek ciężarówek</h2>${TRUCKS.map((x,i)=>`<div class="row" style="padding:10px 0;border-bottom:1px solid #263650"><span><b>${x.name}</b><br><span class="muted">${x.year} • ${x.power} KM • ${x.cons} l/100 km</span></span><span><b>${money(x.price)}</b> <button onclick="buyTruck(${i})">Kup</button></span></div>`).join('')}</div>`
+ const market=TRUCKS.map((x,i)=>{
+   const owned=state.trucks.filter(t=>t.model===x.name).length;
+   return `<div class="buy-card"><div class="row"><div><b>${x.name}</b><div class="muted small">${x.year} • ${x.power} KM • ${x.cons} l/100 km</div></div><div style="text-align:right"><div class="price">${money(x.price)}</div>${owned?`<div class="owned">✓ W FIRMIE: ${owned}</div>`:''}</div></div><button onclick="buyTruck(${i})">🚛 ${owned?'Kup kolejną':'Kup ciężarówkę'}</button></div>`;
+ }).join('');
+ const own=state.trucks.map(t=>`<div class="card"><div class="section-title"><h3>🚛 ${t.model}</h3>${state.truckId===t.id?'<span class="active-mark">● AKTYWNA</span>':'<span class="owned">✓ W FIRMIE</span>'}</div><div class="muted small">${t.plate} • ${t.year} • ${Math.round(t.km).toLocaleString('pl-PL')} km • ${t.power} KM</div><div class="grid"><div class="stat"><span class="muted">STAN</span><b>${Math.round(t.condition)}%</b></div><div class="stat"><span class="muted">PALIWO</span><b>${Math.round(t.fuel)}%</b></div></div><p>📍 ${hub(t.currentHub||'KRZ')?.name||'Krzyżowice'}</p><div class="row"><button ${state.truckId===t.id?'disabled':''} onclick="selectTruck(${t.id})">${state.truckId===t.id?'✓ To jest aktywny zestaw':'Ustaw jako aktywną'}</button><button class="secondary" onclick="refuel(${t.id})">⛽ Tankuj</button></div><div class="row"><button class="secondary" onclick="repair(${t.id})">🔧 Serwis</button><button class="secondary" onclick="plate(${t.id})">🔤 Tablica</button></div></div>`).join('');
+ return `<div class="card"><div class="section-title"><h2>🚛 Twoja flota</h2><span class="pill">${state.trucks.length} ${state.trucks.length===1?'ciężarówka':'ciężarówki'}</span></div><p class="muted">Tutaj widać wyłącznie pojazdy, które naprawdę należą do firmy. <b>● AKTYWNA</b> oznacza zestaw używany obecnie do zleceń.</p></div>${state.lastPurchase?`<div class="toast" onclick="state.lastPurchase='';save();render()">✓ ${state.lastPurchase}<br><span class="small" style="opacity:.8">Dotknij, aby zamknąć</span></div>`:''}<div class="list">${own}</div><div class="card"><div class="section-title"><h2>🛒 Rynek ciężarówek</h2></div><p class="muted">Po zakupie ciężarówka zostaje na liście floty. Nie przełącza automatycznie aktywnego zestawu.</p>${market}</div><div class="card"><h2>🧰 Naczepy</h2><p>Aktywna: <b>${activeTrailer()?.type||'brak'}</b></p><div class="list">${state.trailers.map(t=>`<div class="notice small"><b>${t.type}</b> • ${t.cap} t • stan ${Math.round(t.condition)}% <button ${state.activeTrailerId===t.id?'disabled':''} class="secondary" onclick="selectTrailer(${t.id})">${state.activeTrailerId===t.id?'✓ Aktywna':'Podepnij'}</button></div>`).join('')}</div><details><summary>🛒 Kup naczepę</summary><div class="list">${TRAILERS.map((x,i)=>`<div class="notice small"><b>${x.type}</b> • ${x.cap} t • ${money(x.price)} <button class="secondary" onclick="buyTrailer(${i})">Kup</button></div>`).join('')}</div></details></div>`;
 }
 function drivers(){
  const specialHtml=SPECIAL_DRIVERS.map(cfg=>{const d=state.drivers.find(x=>x.name===cfg.name); const unlocked=state.companyKm>=cfg.unlockKm; return d ? `<div class="card"><h3>⭐ ${cfg.name}</h3><p class="muted">${d.bio||cfg.bio}</p><p>Doświadczenie <b>${d.skill}</b>/110<br>Bezpieczeństwo <b>${d.safety}</b>/110<br>Ekonomia <b>${d.economy}</b>/110</p><button ${state.driverId===d.id?'disabled':''} onclick="selectDriver(${d.id})">${state.driverId===d.id?'🚛 Aktualnie prowadzi':'Wybierz kierowcę'}</button></div>` : `<div class="card"><h3>🔒 ${cfg.name}</h3><p>${cfg.bio}</p><p>Odblokowanie: <b>${fmt(cfg.unlockKm)} km</b><br>Twój przebieg firmy: <b>${fmt(state.companyKm)} km</b></p><button ${unlocked?'':'disabled'} onclick="unlockSpecial('${cfg.name}')">${unlocked?'🔓 Odblokuj':'🔒 Jeszcze zablokowany'}</button></div>`}).join('');
@@ -517,10 +541,12 @@ async function initFleetMap(){
  for(const item of routeJobs){const j=item.job,g=await fetchRouteGeometry(j);const line=g?.coordinates?.map(c=>[c[1],c[0]])||[HUB_COORDS[hubId(j.from)],HUB_COORDS[hubId(j.to)]];L.polyline(line,{color:'#60a5fa',weight:4,opacity:.8,dashArray:'9 8'}).addTo(map);const pos=pointAlongLine(line,Math.max(0,Math.min(1,state.progress/Math.max(1,j.dist))));if(pos&&markerByTruck[item.truckId])markerByTruck[item.truckId].setLatLng(pos)}
  window.ftMap=map;setTimeout(()=>map.invalidateSize(),120);
 }
+function moreTab(){return `<div class="card"><h2>☰ Więcej</h2><p class="muted">Pozostałe moduły firmy są tutaj, żeby główna nawigacja była prosta i czytelna.</p><div class="more-grid"><button onclick="tab='hubs';render()">🏭<br>Huby logistyczne</button><button onclick="tab='drivers';render()">👨‍🔧<br>Kierowcy</button><button onclick="tab='overload';render()">🏗️<br>Gabaryty</button><button onclick="tab='route';render()">🛣️<br>Trasa i pauzy</button></div></div>`}
+
 function render(){
  initHubs();
- ['company','jobs','hubs','fleet','map','drivers','overload','route'].forEach(x=>document.getElementById('t-'+x).classList.toggle('active',x===tab));
- document.getElementById('app').innerHTML=tab==='company'?company():tab==='jobs'?jobs():tab==='hubs'?hubs():tab==='fleet'?fleet():tab==='map'?mapFleet():tab==='drivers'?drivers():tab==='route'?routeTab():overload(); if(tab==='map')initFleetMap();
+ ['company','jobs','map','fleet','more'].forEach(x=>document.getElementById('t-'+x).classList.toggle('active',x===tab));
+ document.getElementById('app').innerHTML=tab==='company'?company():tab==='jobs'?jobs():tab==='fleet'?fleet():tab==='map'?mapFleet():tab==='more'?moreTab():tab==='hubs'?hubs():tab==='drivers'?drivers():tab==='route'?routeTab():overload(); if(tab==='map')initFleetMap();
 }
 render();
 </script>
