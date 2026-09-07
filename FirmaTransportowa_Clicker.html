@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080c14">
+<title>Firma Transportowa — Clicker</title>
+<style>
+:root{
+  --bg:#080c14;--panel:#121925;--panel2:#0e1521;--line:#2b374a;
+  --text:#f5f7fb;--muted:#9aa6b8;--accent:#4f8cff;--good:#35d07f;
+  --warn:#f2b84b;--danger:#ef6b73;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:16px;line-height:1.4}
+button{font:inherit;border:0;cursor:pointer}
+.app{max-width:720px;margin:auto;padding:0 14px 92px}
+header{position:sticky;top:0;z-index:10;background:#080c14;border-bottom:1px solid #202a3a;padding:14px 0 12px}
+.headerrow{display:flex;justify-content:space-between;align-items:center;gap:12px}
+h1{font-size:21px;margin:0}.sub{font-size:12px;color:var(--muted)}
+.money{font-size:22px;font-weight:900;color:var(--good);white-space:nowrap}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:15px;margin-top:12px}
+h2{font-size:18px;margin:0 0 10px}.muted{color:var(--muted)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.stat{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.stat b{display:block;font-size:20px;margin-top:2px}
+.stat span{font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase}
+.clickbox{text-align:center;padding:18px 10px}
+.route{font-size:20px;font-weight:900;margin-bottom:5px}
+.cargo{color:var(--muted);font-size:13px}
+.mainbtn{width:100%;min-height:72px;border-radius:15px;background:var(--accent);color:white;font-size:20px;font-weight:900;margin-top:14px;box-shadow:0 8px 20px #0004}
+.mainbtn:active{transform:scale(.98)}
+.mainbtn:disabled{opacity:.45}
+.progress{height:10px;background:#273246;border-radius:99px;overflow:hidden;margin:12px 0 7px}
+.progress i{display:block;height:100%;background:var(--accent);width:0%}
+.row{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.pill{display:inline-block;background:#1d2a40;border:1px solid #34455f;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:800}
+.list{display:grid;gap:8px}
+.item{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.item .title{font-weight:900}.item .desc{font-size:12px;color:var(--muted);margin:3px 0 8px}
+.item button{background:#263a5c;color:#fff;border-radius:10px;padding:9px 11px;font-weight:800}
+.item button:disabled{opacity:.4}
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:20;background:#0b111d;border-top:1px solid var(--line);padding:7px max(8px,env(safe-area-inset-left)) calc(7px + env(safe-area-inset-bottom))}
+.navin{max-width:720px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.nav button{background:transparent;color:var(--muted);border-radius:11px;padding:9px 3px;font-size:11px;font-weight:800}
+.nav button.active{background:#18335d;color:white}
+.toast{position:fixed;top:70px;left:14px;right:14px;z-index:30;background:#12301f;border:1px solid #2e8b57;border-radius:12px;padding:11px 13px;text-align:center;font-weight:900;display:none}
+.small{font-size:12px}.big{font-size:28px;font-weight:900}
+.locked{opacity:.5}
+@media(min-width:600px){.app{padding-left:0;padding-right:0}.toast{left:50%;right:auto;transform:translateX(-50%);width:420px}}
+</style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+<div class="app">
+<header>
+  <div class="headerrow">
+    <div><h1>🚛 Firma Transportowa</h1><div class="sub">Clicker • rozwijaj firmę kilometr po kilometrze</div></div>
+    <div class="money" id="money">0 zł</div>
+  </div>
+</header>
+<main id="screen"></main>
+</div>
+<nav class="nav">
+  <div class="navin">
+    <button data-tab="firma" class="active">🏢<br>Firma</button>
+    <button data-tab="flota">🚛<br>Flota</button>
+    <button data-tab="kierowcy">👤<br>Kierowcy</button>
+    <button data-tab="rozwoj">⬆️<br>Rozwój</button>
+  </div>
+</nav>
+
+<script>
+const KEY="ft_clicker_v1";
+const fresh={
+ money:5000, km:0, level:1, xp:0, jobs:0, trips:0,
+ fuel:100, coffee:3, cigarettes:5, trucks:1, trailers:1,
+ clickPower:120, autoIncome:0, routeIndex:0, tab:"firma",
+ upgrades:{engine:0,dispatcher:0,office:0},
+ drivers:[
+  {name:"Ty",skill:1,auto:false},
+ ],
+ last:Date.now()
+};
+let s=load();
+function load(){try{return {...fresh,...JSON.parse(localStorage.getItem(KEY))}}catch(e){return {...fresh}}}
+function save(){s.last=Date.now();localStorage.setItem(KEY,JSON.stringify(s))}
+function fmt(n){return Math.round(n).toLocaleString("pl-PL")}
+function money(n){return fmt(n)+" zł"}
+function toast(t){const e=document.getElementById("toast");e.textContent=t;e.style.display="block";clearTimeout(window.tt);window.tt=setTimeout(()=>e.style.display="none",1700)}
+function gainXP(x){s.xp+=x;const need=s.level*100;if(s.xp>=need){s.xp-=need;s.level++;s.clickPower+=20;toast("🎉 Awans! Poziom "+s.level+" — większy zarobek z kursu.");}}
+const routes=[
+ ["Krzyżowice","Wrocław",20,3.2],
+ ["Krzyżowice","Bielany",16,3.0],
+ ["Krzyżowice","Kąty Wrocławskie",17,3.1],
+ ["Dzierżoniów","Wrocław",55,2.7],
+ ["Wrocław","Poznań",175,2.3],
+ ["Wrocław","Berlin",330,2.1],
+ ["Berlin","Hamburg",290,2.0],
+ ["Hamburg","Duisburg",400,2.0],
+ ["Duisburg","Rotterdam",230,2.1],
+ ["Wrocław","Praga",280,2.2]
+];
+const cargos=["AGD","części samochodowe","palety","stal","spożywka","opony","elektronika"];
+function currentRoute(){return routes[s.routeIndex%routes.length]}
+function clickJob(){
+ const r=currentRoute(), base=r[2]*r[3], bonus=s.clickPower*(1+s.level*.03);
+ const earned=Math.max(40,Math.round(base+bonus));
+ if(s.fuel<4){toast("⛽ Za mało paliwa — zatankuj.");return}
+ s.money+=earned;s.km+=r[2];s.jobs++;s.trips++;s.fuel-=Math.max(1,Math.ceil(r[2]/180));
+ gainXP(Math.max(5,Math.round(r[2]/20)));
+ s.routeIndex++;
+ if(Math.random()<.12){s.coffee++;toast("☕ Postój na kawę — zapas +1.");}
+ save();render();
+}
+function buy(type){
+ const data={
+  fuel:[800,"Paliwo 100%"],coffee:[250,"Kawa +10"],cigs:[180,"Papierosy +20"]
+ };
+ const [cost,label]=data[type];
+ if(s.money<cost){toast("Brakuje pieniędzy.");return}
+ s.money-=cost;
+ if(type==="fuel")s.fuel=100;
+ if(type==="coffee")s.coffee+=10;
+ if(type==="cigs")s.cigarettes+=20;
+ save();toast("Kupiono: "+label);render();
+}
+function upgrade(type){
+ const levels={engine:[1000,1800,3200,5200],dispatcher:[1800,3200,5600,9000],office:[2500,4500,7500,12000]};
+ const i=s.upgrades[type], arr=levels[type];
+ if(i>=arr.length){toast("Maksymalny poziom.");return}
+ const cost=arr[i];
+ if(s.money<cost){toast("Brakuje pieniędzy.");return}
+ s.money-=cost;s.upgrades[type]++;
+ if(type==="engine")s.clickPower+=70;
+ if(type==="dispatcher")s.autoIncome+=25;
+ if(type==="office")s.clickPower+=35;
+ save();toast("Ulepszenie kupione.");render();
+}
+function hire(name,cost,skill){
+ if(s.money<cost){toast("Brakuje pieniędzy.");return}
+ s.money-=cost;s.drivers.push({name,skill,auto:true});s.autoIncome+=Math.round(skill*15);save();toast("Zatrudniono "+name);render();
+}
+function buyTruck(){
+ const cost=12000+s.trucks*6500;
+ if(s.money<cost){toast("Na ten ciągnik jeszcze Cię nie stać.");return}
+ s.money-=cost;s.trucks++;s.autoIncome+=35;s.fuel=100;save();toast("🚛 Nowy ciągnik w firmie!");render();
+}
+function tick(){
+ const now=Date.now(), sec=Math.max(0,Math.min(60,(now-s.last)/1000));
+ if(sec>0 && s.autoIncome>0){s.money+=s.autoIncome*sec/60;s.km+=s.autoIncome*0.04*sec/60;}
+ s.last=now;save();
+ if(s.tab==="firma")render();
+}
+function firma(){
+ const r=currentRoute(), need=s.level*100;
+ return `<section class="card clickbox">
+   <div class="pill">POZIOM ${s.level} • KLIKACZ TRANSPORTOWY</div>
+   <div class="route">${r[0]} → ${r[1]}</div>
+   <div class="cargo">Ładunek: ${cargos[s.jobs%cargos.length]} • ${r[2]} km</div>
+   <button class="mainbtn" onclick="clickJob()">🚚 WYKONAJ KURS<br><span class="small">+ zarobek • + kilometry • + doświadczenie</span></button>
+   <div class="progress"><i style="width:${Math.min(100,s.xp/need*100)}%"></i></div>
+   <div class="row small"><span>Do następnego poziomu</span><b>${s.xp}/${need} XP</b></div>
+ </section>
+ <section class="stats">
+   <div class="stat"><span>Kilometry</span><b>${fmt(s.km)} km</b></div>
+   <div class="stat"><span>Wykonane kursy</span><b>${fmt(s.jobs)}</b></div>
+   <div class="stat"><span>Ciężarówki</span><b>${s.trucks}</b></div>
+   <div class="stat"><span>Zarobek pasywny</span><b>${money(s.autoIncome)}/min</b></div>
+ </section>
+ <section class="card">
+   <h2>🧭 Dyspozytornia</h2>
+   <div class="row"><span class="muted">Następne zlecenie</span><b>${r[0]} → ${r[1]}</b></div>
+   <div class="row"><span class="muted">Stawka trasy</span><b>${r[3].toFixed(1)} zł/km</b></div>
+   <div class="row"><span class="muted">Paliwo</span><b>${Math.round(s.fuel)}%</b></div>
+   <div class="row"><span class="muted">Kawa / papierosy</span><b>${s.coffee} / ${s.cigarettes}</b></div>
+   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+    <button class="item" onclick="buy('fuel')">⛽ Zatankuj<br><b>800 zł</b></button>
+    <button class="item" onclick="buy('coffee')">☕ Kup kawę<br><b>250 zł</b></button>
+   </div>
+ </section>`;
+}
+function flota(){
+ return `<section class="card"><h2>🚛 Flota</h2><div class="big">${s.trucks} ciągników</div><div class="muted">Każdy dodatkowy ciągnik zwiększa dochód automatyczny.</div><button class="mainbtn" style="min-height:58px;font-size:16px" onclick="buyTruck()">+ KUP CIĘŻARÓWKĘ • ${money(12000+s.trucks*6500)}</button></section>
+ <section class="card"><h2>📦 Naczepy</h2><div class="row"><b>${s.trailers} szt.</b><span class="pill">STANDARD</span></div><p class="muted small">Rozwój naczep może później odblokować cięższe i ponadgabarytowe ładunki.</p></section>`;
+}
+function kierowcy(){
+ const rows=s.drivers.map((d,i)=>`<div class="item"><div class="title">👤 ${d.name}</div><div class="desc">Umiejętność: ${d.skill}/10 • ${d.auto?"zarabia automatycznie":"kierujesz sam"}</div><span class="pill">${d.auto?"AKTYWNY":"WŁAŚCICIEL"}</span></div>`).join("");
+ return `<section class="card"><h2>👥 Kierowcy</h2><div class="list">${rows}</div></section>
+ <section class="card"><h2>➕ Zatrudnij</h2>
+ <div class="list">
+  <div class="item"><div class="title">Piotrek</div><div class="desc">Bardzo dobry kierowca • wysoka produktywność</div><button onclick="hire('Piotrek',4500,9)">Zatrudnij • 4500 zł</button></div>
+  <div class="item"><div class="title">Marian</div><div class="desc">Doświadczony kierowca • klimat CB</div><button onclick="hire('Marian',3800,8)">Zatrudnij • 3800 zł</button></div>
+ </div></section>`;
+}
+function rozwoj(){
+ const names={engine:["Silnik i osiągi","Większy zarobek z każdego kursu"],dispatcher:["Dyspozytor","Stały dochód z pracującej floty"],office:["Baza firmy","Lepsza efektywność firmy"]};
+ let out=`<section class="card"><h2>⬆️ Rozwój firmy</h2><p class="muted">Kupuj ulepszenia i zwiększaj możliwości przedsiębiorstwa.</p><div class="list">`;
+ for(const k of ["engine","dispatcher","office"]){
+  const lv=s.upgrades[k], prices={engine:[1000,1800,3200,5200],dispatcher:[1800,3200,5600,9000],office:[2500,4500,7500,12000]}[k];
+  const cost=prices[lv];
+  out+=`<div class="item"><div class="title">${names[k][0]} • poziom ${lv}/${prices.length}</div><div class="desc">${names[k][1]}</div><button onclick="upgrade('${k}')" ${cost===undefined?"disabled":""}>${cost===undefined?"MAKSIMUM":"Ulepsz • "+money(cost)}</button></div>`;
+ }
+ out+=`</div></section><section class="card"><h2>📊 Wyniki</h2><div class="stats" style="margin-top:0"><div class="stat"><span>Poziom</span><b>${s.level}</b></div><div class="stat"><span>XP</span><b>${s.xp}</b></div><div class="stat"><span>Kursy</span><b>${s.jobs}</b></div><div class="stat"><span>Flota</span><b>${s.trucks}</b></div></div></section>`;
+ return out;
+}
+function render(){
+ document.getElementById("money").textContent=money(s.money);
+ document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.tab===s.tab));
+ const f={firma,kierowcy,flota,rozwoj}[s.tab]||firma;
+ document.getElementById("screen").innerHTML=f();
+}
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{s.tab=b.dataset.tab;save();render()});
+setInterval(tick,1000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){tick();render()}});
+render();
+</script>
+</body>
+</html>
