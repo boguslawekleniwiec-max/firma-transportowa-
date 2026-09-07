@@ -4,7 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<title>Firma Transportowa 3.0</title>
+<title>Firma Transportowa 3.2 — Nowy interfejs</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#0a1020;color:#eef3ff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 button,select{font:inherit}button{border:0;border-radius:14px;padding:12px 15px;background:#2563eb;color:white;font-weight:800}
@@ -13,19 +15,41 @@ button.secondary{background:#26344d}button.warn{background:#b45309}button.danger
 h1{font-size:30px;margin:0 0 4px}.sub{color:#9eabc2}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:16px 0}
 .card{background:#131d31;border:1px solid #263650;border-radius:22px;padding:18px;box-shadow:0 10px 30px #0002}
 .stat b{font-size:27px;display:block}.muted{color:#93a1ba}.good{color:#5ee39a}.bad{color:#ff7d7d}.gold{color:#ffd166}
-.tabs{position:fixed;bottom:0;left:0;right:0;background:#0d1729ee;backdrop-filter:blur(16px);border-top:1px solid #263650;display:flex;justify-content:flex-start;align-items:stretch;z-index:100;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none;position:fixed}
-.tabs::-webkit-scrollbar{display:none}.tabs button{border-radius:0;background:transparent;color:#aeb9cb;flex:0 0 auto;min-width:96px;white-space:nowrap;padding:13px 12px}.tabs button.active{color:white;background:#16243b}
+.tabs{position:fixed;bottom:0;left:0;right:0;background:#0d1729ee;backdrop-filter:blur(16px);border-top:1px solid #263650;display:flex;flex-wrap:wrap;align-items:stretch;z-index:100;overflow:hidden;padding-bottom:env(safe-area-inset-bottom)}
+.tabs::-webkit-scrollbar{display:none}.tabs button{border-radius:0;background:transparent;color:#aeb9cb;flex:0 0 25%;width:25%;min-width:0;white-space:nowrap;padding:12px 8px;font-size:13px}.tabs button.active{color:white;background:#16243b}
+@media(min-width:700px){.tabs{flex-wrap:nowrap;overflow:hidden}.tabs button{flex:1 1 0;width:auto;min-width:0}}
+#fleetMap{height:58vh;min-height:420px;border-radius:18px;overflow:hidden;border:1px solid #263650}.map-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.map-legend span{background:#0d1729;padding:7px 10px;border-radius:999px;font-size:12px}
 .row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}.list{display:grid;gap:10px}.pill{display:inline-block;padding:5px 9px;border-radius:999px;background:#22304a;color:#c8d4e8;font-size:12px;font-weight:800}
 .progress{height:10px;background:#26344d;border-radius:99px;overflow:hidden}.progress>i{display:block;height:100%;background:#3b82f6}
 table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:9px;border-bottom:1px solid #263650;text-align:left}th{color:#9eabc2}
 .notice{padding:12px;border-radius:14px;background:#18243a;border-left:4px solid #3b82f6;margin:10px 0}.log{max-height:260px;overflow:auto}.small{font-size:13px}.dangerbox{border-left-color:#ef4444}.greenbox{border-left-color:#22c55e}
 @media(min-width:800px){.cols{display:grid;grid-template-columns:1.3fr .7fr;gap:14px}}
+
+/* 3.2 — nowy interfejs aplikacji */
+:root{--bg:#070b14;--panel:#111827;--panel2:#0d1524;--line:#24324a;--text:#f4f7ff;--muted:#8e9bb3;--accent:#3b82f6;--accent2:#60a5fa;--good:#34d399;--warn:#f59e0b;--danger:#f87171}
+html{background:var(--bg)}body{background:radial-gradient(circle at 50% -10%,#182947 0,#0b1220 38%,#070b14 75%);min-height:100vh;color:var(--text);letter-spacing:.05px}
+.wrap{max-width:1180px;padding:14px 12px calc(118px + env(safe-area-inset-bottom));}
+.top{position:sticky;top:0;z-index:90;margin:-14px -12px 14px;padding:13px 12px 12px;background:rgba(7,11,20,.82);backdrop-filter:blur(20px);border-bottom:1px solid rgba(96,165,250,.13)}
+.top h1{font-size:21px;letter-spacing:-.35px}.top .sub{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:72vw}.top>button{padding:9px 11px;border-radius:11px;font-size:12px}
+.card{background:linear-gradient(145deg,rgba(19,29,49,.96),rgba(11,18,32,.96));border:1px solid rgba(91,113,148,.24);border-radius:18px;padding:15px;box-shadow:0 12px 35px rgba(0,0,0,.22);}
+.card h2{font-size:18px;margin:0 0 8px}.card h3{margin:0 0 6px;font-size:16px}p{line-height:1.48}.muted{color:var(--muted)}
+.grid{gap:10px;margin:12px 0}.stat{position:relative;overflow:hidden;padding:14px}.stat:after{content:'';position:absolute;width:70px;height:70px;border-radius:50%;right:-35px;top:-35px;background:rgba(59,130,246,.10)}.stat b{font-size:23px;letter-spacing:-.5px}.stat .muted{font-size:10px;font-weight:900;letter-spacing:.9px}
+.progress{height:8px;background:#202d42;border-radius:99px}.progress>i{background:linear-gradient(90deg,#2563eb,#60a5fa);border-radius:99px}
+button{border-radius:11px;padding:10px 12px;font-size:13px;box-shadow:0 5px 15px rgba(0,0,0,.12);transition:.15s transform,.15s filter}button:active{transform:scale(.97);filter:brightness(.92)}button.secondary{background:#202d43;color:#e7edf8}
+.pill{background:#1a2940;border:1px solid rgba(96,165,250,.12);padding:4px 8px}.notice{background:#101b2d;border:1px solid rgba(91,113,148,.16);border-left:3px solid var(--accent)}
+.tabs{padding:7px 7px calc(7px + env(safe-area-inset-bottom));gap:5px;background:rgba(8,13,23,.91);border-top:1px solid rgba(96,165,250,.18);box-shadow:0 -10px 30px rgba(0,0,0,.28);backdrop-filter:blur(22px)}
+.tabs button{height:52px;border-radius:13px;padding:6px 3px;font-size:10px;font-weight:800;line-height:1.15;color:#8e9bb3;border:1px solid transparent}.tabs button:first-line{font-size:17px}.tabs button.active{color:#fff;background:linear-gradient(180deg,#18345e,#122541);border-color:rgba(96,165,250,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+#fleetMap{height:55vh;min-height:360px;border-radius:16px;filter:saturate(.9) contrast(1.02)}.leaflet-control-zoom a{background:#101a2b!important;color:#fff!important;border-color:#34435b!important}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#101a2b;color:#eef3ff}.leaflet-popup-content{font-size:13px;line-height:1.45}
+details{background:rgba(255,255,255,.015);border-radius:12px}summary{cursor:pointer;padding:8px 0;font-weight:800}
+@media(max-width:699px){h1{font-size:18px}.cols{grid-template-columns:1fr}.card{padding:14px}.row{gap:7px}.row>button{flex:1 1 auto}.list .card{border-radius:16px}.tabs button{flex:0 0 calc(25% - 4px);width:calc(25% - 4px)}}
+@media(min-width:700px){.wrap{padding-bottom:90px}.tabs{padding:7px 10px}.tabs button{height:48px;font-size:12px}.tabs button:first-line{font-size:18px}}
+
 </style>
 </head>
 <body>
 <div class="wrap">
 <div class="top">
-  <div><h1>🚛 Firma Transportowa 3.0</h1><div class="sub">Transport • tachograf • realne pauzy • zdarzenia • kontrakty • flota • finanse</div></div>
+  <div><h1>🚛 Firma Transportowa <span style="color:#60a5fa">3.2</span></h1><div class="sub">Panel kierowcy • flota • mapa • zlecenia • finanse</div></div>
   <button class="secondary" onclick="resetGame()">↻ Reset</button>
 </div>
 <div id="app"></div>
@@ -35,6 +59,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:9px;borde
 <button id="t-jobs" onclick="tab='jobs';render()">📋<br>Zlecenia</button>
 <button id="t-hubs" onclick="tab='hubs';render()">🏭<br>Huby</button>
 <button id="t-fleet" onclick="tab='fleet';render()">🚛<br>Flota</button>
+<button id="t-map" onclick="tab='map';render()">🗺️<br>Mapa</button>
 <button id="t-drivers" onclick="tab='drivers';render()">👨‍🔧<br>Kierowcy</button>
 <button id="t-overload" onclick="tab='overload';render()">🏗️<br>Gabaryty</button>
 <button id="t-route" onclick="tab='route';render()">🛣️<br>Trasa</button>
@@ -106,14 +131,14 @@ function fatigueFactor(){return Math.max(0.65,1-(100-state.energy)*0.002)}
 function fresh(){
  return {money:150000,day:1,rep:50,weekDrive:0,fortDrive:0,companyKm:0,driverId:1,truckId:1,nextDriver:2,plateSeq:1,coffee:0,coffeeSips:0,cigarettes:0,
    drivers:[{id:1,name:'Marek',skill:68,safety:74,economy:66,salary:6500,driveToday:0,driveWeek:0,shift:0,restDue:0}],
-   trucks:[{id:1,model:'MAN TGX 18.500',year:2018,km:740000,power:500,cons:29,condition:78,value:185000,driverId:1,fuel:72,plate:'DWR 00001',mods:{engine:0,tires:0,tank:0,comfort:0}}],
+   trucks:[{id:1,currentHub:'Krzyżowice',model:'MAN TGX 18.500',year:2018,km:740000,power:500,cons:29,condition:78,value:185000,driverId:1,fuel:72,plate:'DWR 00001',mods:{engine:0,tires:0,tank:0,comfort:0}}],
    trailers:[{id:1,type:'Firanka',cap:24,value:65000,condition:88}],
    jobs:[],activeJob:null,progress:0,loaded:false,hub:null,logs:['Dzień 1: firma została otwarta. Jeden MAN czeka na trasę.'],
    hubState:{},lastEvent:'',routeVersion:2,gameVersion:3,activeTrailerId:1,contracts:[],loans:[],leasePayments:[],events:[],achievements:[],ratings:[],base:{name:'Krzyżowice',level:1,warehouse:0,workshop:0,dispatchers:0},
    break15:false,break45Due:false,energy:100,hunger:20,morale:75,routeRisk:0,weekRestHours:0,nightWork:0,adrLicense:false
  };
 }
-function load(){try{const x=JSON.parse(localStorage.ft20)||fresh(); if(x.companyKm==null)x.companyKm=0; if(x.driverId==null)x.driverId=x.drivers?.[0]?.id||1; if(x.truckId==null)x.truckId=x.trucks?.[0]?.id||1; if(x.plateSeq==null)x.plateSeq=1; if(x.coffee==null)x.coffee=0; if(x.coffeeSips==null)x.coffeeSips=0; if(x.cigarettes==null)x.cigarettes=0; x.trucks?.forEach((t,i)=>{if(!t.plate)t.plate='DWR '+String(i+1).padStart(5,'0'); if(!t.mods)t.mods={engine:0,tires:0,tank:0,comfort:0}});
+function load(){try{const x=JSON.parse(localStorage.ft20)||fresh(); if(x.companyKm==null)x.companyKm=0; if(x.driverId==null)x.driverId=x.drivers?.[0]?.id||1; if(x.truckId==null)x.truckId=x.trucks?.[0]?.id||1; if(x.plateSeq==null)x.plateSeq=1; if(x.coffee==null)x.coffee=0; if(x.coffeeSips==null)x.coffeeSips=0; if(x.cigarettes==null)x.cigarettes=0; x.trucks?.forEach((t,i)=>{if(!t.plate)t.plate='DWR '+String(i+1).padStart(5,'0'); if(!t.mods)t.mods={engine:0,tires:0,tank:0,comfort:0}; if(!t.currentHub)t.currentHub=x.hub||x.base?.name||'Krzyżowice'});
  if(!x.gameVersion)x.gameVersion=3; if(!x.trailers)x.trailers=[{id:1,type:'Firanka',cap:24,value:65000,condition:88}]; if(x.activeTrailerId==null)x.activeTrailerId=x.trailers[0]?.id||1;
  if(!x.contracts)x.contracts=[]; if(!x.loans)x.loans=[]; if(!x.leasePayments)x.leasePayments=[]; if(!x.events)x.events=[]; if(!x.achievements)x.achievements=[]; if(!x.ratings)x.ratings=[];
  if(!x.base)x.base={name:'Krzyżowice',level:1,warehouse:0,workshop:0,dispatchers:0};
@@ -279,7 +304,7 @@ function profitBadge(j){
 
 function accept(id){
  if(state.activeJob){alert('Najpierw zakończ aktualne zlecenie.');return}
- const j=state.jobs.find(x=>x.id===id);if(j.adr&&!state.adrLicense){alert('ADR: ten ładunek wymaga uprawnień ADR.');return}if(!trailerAllows(j.cargo)){alert('Ta naczepa nie pasuje do tego ładunku. Wybierz odpowiednią naczepę.');return}state.activeJob=j;state.loaded=false;state.hub=j.from;state.progress=0;
+ const j=state.jobs.find(x=>x.id===id);if(j.adr&&!state.adrLicense){alert('ADR: ten ładunek wymaga uprawnień ADR.');return}if(!trailerAllows(j.cargo)){alert('Ta naczepa nie pasuje do tego ładunku. Wybierz odpowiednią naczepę.');return}state.activeJob=j;state.loaded=false;state.hub=j.from;state.progress=0; const at=truck(); if(at) at.currentHub=j.from;
  log('Przyjęto zlecenie '+j.cargo+': '+hub(j.from).name+' → '+hub(j.to).name+'.');save();render()
 }
 function loadCargo(){
@@ -294,7 +319,7 @@ function unloadCargo(){
  state.money+=j.pay-c.total;state.rep=Math.min(100,state.rep+(c.profit>=0?2:-2));
  log('Rozładunek w '+h.name+' zakończony. Przychód '+money(j.pay)+', koszty '+money(c.total)+', wynik '+money(c.profit)+'.');
  if(j.contractId){const cc=state.contracts.find(x=>x.id===j.contractId);if(cc){cc.done++;cc.quality=Math.max(0,Math.min(100,cc.quality+(c.profit>=0?2:-5)));log('📑 Kontrakt '+cc.client+': '+cc.done+'/'+cc.need);if(cc.done>=cc.need){log('🏆 Kontrakt '+cc.client+' wykonany w całości!');state.rep=Math.min(100,state.rep+5)}}}else{const stars=c.profit>=0?(Math.random()<.75?5:4):(Math.random()<.5?3:2);state.ratings.unshift(stars);state.ratings=state.ratings.slice(0,20);log('⭐ Klient ocenił dostawę na '+stars+'/5.');if(stars===5)unlockAchievement('rating5','Klient dał 5 gwiazdek');}
-state.activeJob=null;state.loaded=false;state.progress=0;state.hub=null;makeJobs();save();render()
+state.activeJob=null;state.loaded=false;state.progress=0;state.hub=null; const at=truck(); if(at) at.currentHub=j.to;makeJobs();save();render()
 }
 function endDay(){
  const fixed=650+state.trucks.length*150+state.drivers.length*250;
@@ -424,10 +449,53 @@ function routeTab(){
  <div class="card"><h2>🎲 Ostatnie zdarzenia</h2>${state.events?.slice(0,8).map(e=>`<div class="notice small">Dzień ${e.day} • ${e.place} • ${e.text}</div>`).join('')||'<p class="muted">Jeszcze nic się nie wydarzyło.</p>'}</div></div></div>`
 }
 
+
+function mapTruckPosition(t){
+ const job=state.activeJob&&state.truckId===t.id?state.activeJob:null;
+ if(job){
+  const a=HUB_COORDS[job.from],b=HUB_COORDS[job.to];
+  const p=Math.max(0,Math.min(1,state.progress/Math.max(1,job.dist)));
+  return [a[0]+(b[0]-a[0])*p,a[1]+(b[1]-a[1])*p];
+ }
+ const h=hub(t.currentHub||state.hub||'KRZ')||HUBS.find(x=>x.id==='KRZ');
+ return HUB_COORDS[h.id];
+}
+function mapFleet(){
+ return `<div class="card"><h2>🗺️ Mapa floty Europy</h2>
+ <p class="muted">Podgląd pozycji zestawów. Aktywna ciężarówka przesuwa się po swojej trasie wraz z postępem zlecenia.</p>
+ <div id="fleetMap"></div>
+ <div class="map-legend"><span>📍 Hub</span><span>🚛 Aktywna ciężarówka</span><span>🅿️ Pozostała flota</span></div></div>
+ <div class="card"><h3>🚛 Pozycje floty</h3>
+ <div class="list">${state.trucks.map(t=>{
+  const j=state.activeJob&&state.truckId===t.id?state.activeJob:null;
+  const pos=j?`${hub(j.from).name} → ${hub(j.to).name} • ${Math.round(state.progress)}/${j.dist} km`:(hub(t.currentHub||'KRZ')?.name||'Krzyżowice');
+  return `<div class="notice"><b>${t.plate||'DWR'}</b> • ${t.model}<br><span class="muted">${pos}</span></div>`;
+ }).join('')}</div></div>`;
+}
+function initFleetMap(){
+ const el=document.getElementById('fleetMap');if(!el||typeof L==='undefined')return;
+ if(window.ftMap){window.ftMap.remove();window.ftMap=null}
+ const map=L.map(el,{zoomControl:true}).setView([51.3,15.5],5);
+ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+ HUBS.forEach(h=>{
+  const m=L.marker(HUB_COORDS[h.id]).addTo(map);
+  m.bindPopup(`<b>🏭 ${h.name}</b><br>${h.country} • ${h.type}<br>Parking: ${h.parking} miejsc`);
+ });
+ state.trucks.forEach(t=>{
+  const p=mapTruckPosition(t),active=state.activeJob&&state.truckId===t.id;
+  const icon=L.divIcon({className:'truck-marker',html:`<div style="font-size:25px;filter:drop-shadow(0 2px 2px #000)">${active?'🚛':'🅿️'}</div>`,iconSize:[30,30],iconAnchor:[15,15]});
+  const m=L.marker(p,{icon}).addTo(map),j=active?state.activeJob:null;
+  const desc=j?`${hub(j.from).name} → ${hub(j.to).name}<br>Postęp: ${Math.round(state.progress)}/${j.dist} km<br>Kierowca: ${driver().name}`:`Hub: ${(hub(t.currentHub||'KRZ')||{}).name||'Krzyżowice'}`;
+  m.bindPopup(`<b>${t.plate||'DWR'}</b><br>${t.model}<br>${desc}<br>Paliwo: ${Math.round(t.fuel)}%<br>Stan: ${Math.round(t.condition)}%`);
+  if(j){L.polyline([HUB_COORDS[j.from],HUB_COORDS[j.to]],{dashArray:'8 8'}).addTo(map)}
+ });
+ window.ftMap=map;setTimeout(()=>map.invalidateSize(),120);
+}
+
 function render(){
  initHubs();
- ['company','jobs','hubs','fleet','drivers','overload','route'].forEach(x=>document.getElementById('t-'+x).classList.toggle('active',x===tab));
- document.getElementById('app').innerHTML=tab==='company'?company():tab==='jobs'?jobs():tab==='hubs'?hubs():tab==='fleet'?fleet():tab==='drivers'?drivers():tab==='route'?routeTab():overload();
+ ['company','jobs','hubs','fleet','map','drivers','overload','route'].forEach(x=>document.getElementById('t-'+x).classList.toggle('active',x===tab));
+ document.getElementById('app').innerHTML=tab==='company'?company():tab==='jobs'?jobs():tab==='hubs'?hubs():tab==='fleet'?fleet():tab==='map'?mapFleet():tab==='drivers'?drivers():tab==='route'?routeTab():overload(); if(tab==='map')initFleetMap();
 }
 render();
 </script>
